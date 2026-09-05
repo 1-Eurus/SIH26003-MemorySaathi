@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { GamePortal as CoconutMalletGame } from './games/coconut-mallet'
+import { FolkMusicPortal } from './games/folk-music-portal/FolkMusicPortal'
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type AppFlow = 'onboarding' | 'portal'
@@ -16,6 +17,7 @@ type Screen =
   | 'family-analytics'
   | 'family-photos'
   | 'care'
+  | 'game-folk-music'
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const ONBOARD_LANGUAGES = [
@@ -1578,8 +1580,34 @@ function GamesScreen({ onNavigate, onBack, micActive, onMicToggle }: {
 
         {/* Featured games */}
         <div className="flex flex-col gap-4">
+          <button
+            onClick={() => onNavigate('game-folk-music')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{ background: '#355FC7' }}
+          >
+            <div className="p-5">
+              <div className="mb-3 text-4xl">🎵</div>
+
+              <h2 className="text-xl font-extrabold text-white">
+                North-East Folk Music
+              </h2>
+
+              <p
+                className="mt-1 text-sm font-medium"
+                style={{
+                  color: '#DCE6FF',
+                  fontFamily: 'DM Sans, sans-serif',
+                }}
+              >
+                Listen to traditional music and match it with its story.
+              </p>
+
+              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
+                ▶ Start Game
+              </div>
+            </div>
+          </button>          
           {/* Family Tree */}
-                    {/* Family Tree */}
           <button
             onClick={() => onNavigate('game-tree')}
             className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
@@ -2734,6 +2762,7 @@ export default function App() {
                   {screen === 'game-tree' && <FamilyTreeGame onBack={goBack} {...mic} />}
                   {screen === 'game-match' && <MatchFaceGame onBack={goBack} {...mic} />}
                   {screen === 'game-coconut-mallet' && <CoconutMalletGame />}
+                  {screen === 'game-folk-music' && <FolkMusicPortal />}
                   {screen === 'family' && <FamilyPortalScreen onNavigate={navigate} onBack={goBack} {...mic} />}
                   {screen === 'family-analytics' && <AnalyticsDashboard onBack={goBack} {...mic} />}
                   {screen === 'family-photos' && <PhotoManager onBack={goBack} {...mic} />}

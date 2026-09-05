@@ -1,6 +1,6 @@
 import { Amphora, Bird, Drum, Flower2, Mountain, Music2, TreePine, Wheat } from 'lucide-react'
-import type { CulturalEntry } from '../types'
-import { buildMelody, freq } from '../utils/music'
+import type { CulturalEntry } from './types'
+import { buildMelody, freq } from './music'
 
 /**
  * The melodies below are original, synthesised gameplay cues — a stylised

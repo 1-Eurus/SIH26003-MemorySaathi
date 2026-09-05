@@ -1,14 +1,14 @@
 import { useCallback, useMemo, useState } from 'react'
 import { Sparkles } from 'lucide-react'
-import { culturalEntries } from './data/culturalEntries'
-import { useFolkAudio } from './hooks/useFolkAudio'
-import { shuffle } from './utils/shuffle'
-import { AudioPlayerCard } from './components/AudioPlayerCard'
-import { StoryGrid } from './components/StoryGrid'
-import { CulturalFactModal } from './components/CulturalFactModal'
-import { Scoreboard } from './components/Scoreboard'
-import type { CardFeedback } from './components/StoryCard'
+import { useFolkAudio } from "./useFolkAudio";
+import { shuffle } from "./shuffle";
+import { AudioPlayerCard } from "./AudioPlayerCard";
+import { StoryGrid } from "./StoryGrid";
+import { CulturalFactModal } from "./CulturalFactModal";
+import { Scoreboard } from './Scoreboard'
+import type { CardFeedback } from './StoryCard'
 import type { CulturalEntry } from './types'
+import { culturalEntries } from "./culturalEntries";
 
 const INCORRECT_FEEDBACK_MS = 650
 
