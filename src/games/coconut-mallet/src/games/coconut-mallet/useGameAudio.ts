@@ -1,10 +1,6 @@
 import { useCallback, useRef } from 'react'
 
-/**
- * Tiny synth built on the Web Audio API so the game needs no bundled audio
- * assets. All sounds are short and gentle by design — this plays for
- * patients doing repetitive rehab reps, so nothing here should startle.
- */
+/** Tiny synth built on the Web Audio API so the game needs no bundled audio assets. */
 export function useGameAudio() {
   const ctxRef = useRef<AudioContext | null>(null)
 
@@ -43,19 +39,19 @@ export function useGameAudio() {
     [],
   )
 
-  /** Soft tap — played when the coconut grazes an obstacle. */
+  /** Soft tap — obstacle graze / minor feedback. */
   const playPop = useCallback(() => {
     const ctx = getContext()
     playTone(ctx, 220, ctx.currentTime, 0.12, 0.14, 'triangle')
   }, [getContext, playTone])
 
-  /** Low thud — played on a completed but unsuccessful attempt. */
+  /** Low thud — a failed/incomplete attempt. */
   const playThud = useCallback(() => {
     const ctx = getContext()
     playTone(ctx, 130, ctx.currentTime, 0.16, 0.18, 'sine')
   }, [getContext, playTone])
 
-  /** Rising four-note chime — played on a successful hit/goal. */
+  /** Rising four-note chime — a successful hit/goal. */
   const playCheer = useCallback(() => {
     const ctx = getContext()
     const now = ctx.currentTime
@@ -65,5 +61,31 @@ export function useGameAudio() {
     })
   }, [getContext, playTone])
 
-  return { playPop, playThud, playCheer }
+  /** Sharp crack — the mallet actually connecting with the moving ball. */
+  const playStrike = useCallback(() => {
+    const ctx = getContext()
+    const now = ctx.currentTime
+    playTone(ctx, 900, now, 0.05, 0.2, 'square')
+    playTone(ctx, 180, now, 0.12, 0.18, 'triangle')
+  }, [getContext, playTone])
+
+  /** Harsh buzz — a hazard/obstacle actually costing a life now. */
+  const playHazard = useCallback(() => {
+    const ctx = getContext()
+    const now = ctx.currentTime
+    playTone(ctx, 110, now, 0.22, 0.22, 'sawtooth')
+    playTone(ctx, 98, now + 0.05, 0.22, 0.18, 'sawtooth')
+  }, [getContext, playTone])
+
+  /** Descending tone — game over. */
+  const playGameOver = useCallback(() => {
+    const ctx = getContext()
+    const now = ctx.currentTime
+    const notes = [392, 349.23, 293.66, 220]
+    notes.forEach((frequency, index) => {
+      playTone(ctx, frequency, now + index * 0.16, 0.3, 0.2, 'triangle')
+    })
+  }, [getContext, playTone])
+
+  return { playPop, playThud, playCheer, playStrike, playHazard, playGameOver }
 }

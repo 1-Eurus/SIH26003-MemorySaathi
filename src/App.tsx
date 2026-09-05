@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { GamePortal as CoconutMalletGame } from './games/coconut-mallet'
+import { GamePortal as CoconutMalletGame } from './games/coconut-mallet/src/games/coconut-mallet/index.ts'
 import { FolkMusicPortal } from './games/folk-music-portal/FolkMusicPortal'
 // ─── Types ────────────────────────────────────────────────────────────────────
 

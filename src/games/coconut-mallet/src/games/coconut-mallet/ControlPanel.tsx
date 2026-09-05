@@ -1,38 +1,39 @@
 import { Gauge, Target } from 'lucide-react'
 import { SENSITIVITY_MAX, SENSITIVITY_MIN } from './constants'
-import type { Difficulty } from './types'
+import type { StartingDifficulty } from './types'
 
 interface ControlPanelProps {
-  difficulty: Difficulty
-  onDifficultyChange: (difficulty: Difficulty) => void
+  startingDifficulty: StartingDifficulty
+  onStartingDifficultyChange: (difficulty: StartingDifficulty) => void
   sensitivity: number
   onSensitivityChange: (value: number) => void
 }
 
-const DIFFICULTY_OPTIONS: { value: Difficulty; label: string }[] = [
-  { value: 'easy', label: 'Easy' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'hard', label: 'Hard' },
+const DIFFICULTY_OPTIONS: { value: StartingDifficulty; label: string }[] = [
+  { value: 'easy', label: 'Easy start' },
+  { value: 'normal', label: 'Normal start' },
+  { value: 'hard', label: 'Hard start' },
 ]
 
-export function ControlPanel({ difficulty, onDifficultyChange, sensitivity, onSensitivityChange }: ControlPanelProps) {
+export function ControlPanel({ startingDifficulty, onStartingDifficultyChange, sensitivity, onSensitivityChange }: ControlPanelProps) {
   return (
     <div className="grid gap-4 rounded-2xl border-2 border-[#E8D5B8] bg-white p-4 sm:grid-cols-2 sm:p-5">
       <div>
         <div className="mb-2 flex items-center gap-2">
           <Target className="h-5 w-5 text-[#355FC7]" strokeWidth={2.4} />
-          <span className="font-bold text-[#1D2B49]">Target size</span>
+          <span className="font-bold text-[#1D2B49]">Starting level</span>
         </div>
+        <p className="mb-2 text-xs font-semibold text-[#9A8A76]">Changing this restarts your run from that level.</p>
         <div className="grid grid-cols-3 gap-2">
           {DIFFICULTY_OPTIONS.map((option) => (
             <button
               key={option.value}
               type="button"
-              onClick={() => onDifficultyChange(option.value)}
+              onClick={() => onStartingDifficultyChange(option.value)}
               className={`min-h-[52px] rounded-xl border-2 font-bold transition-colors ${
-                difficulty === option.value
+                startingDifficulty === option.value
                   ? 'border-[#355FC7] bg-[#355FC7] text-white'
-                  : 'border-[#E8D5B8] bg-[#FBF8F0] text-[#1D2B49] hover:bg-[#F1E3A4]/50'
+                  : 'border-[#E8D5B8] bg-[#FBF8F0] text-[#1D2B49] hover:bg-[#F1E3A4]/40'
               }`}
             >
               {option.label}

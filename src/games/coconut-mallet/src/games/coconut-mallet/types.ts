@@ -3,8 +3,10 @@
 /** Which mini-game is currently active. */
 export type GameMode = 'mallet' | 'coconut'
 
-/** Controls goal size and obstacle count/speed. */
-export type Difficulty = 'easy' | 'medium' | 'hard'
+/** Which level index to start from — see STARTING_LEVEL_INDEX in constants.ts. */
+export type StartingDifficulty = 'easy' | 'normal' | 'hard'
+
+export type GameStatus = 'playing' | 'levelComplete' | 'lifeLost' | 'gameOver' | 'victory'
 
 /**
  * A single obstacle in Coconut Goal mode. Coordinates are percentages of
@@ -27,9 +29,7 @@ export interface Obstacle {
   phase: number
 }
 
-/** Outcome reported by the play area after each drag attempt. */
-export interface RoundResult {
-  success: boolean
-  /** 0–100 precision score for the attempt (0 for a clean miss). */
-  accuracy: number
+/** Reported after each successful goal/hit, for scoring with combo bonuses. */
+export interface HitResult {
+  comboAtHit: number
 }
