@@ -3,6 +3,8 @@ import { GamePortal as CoconutMalletGame } from './games/coconut-mallet/src/game
 import { FolkMusicPortal } from './games/folk-music-portal/FolkMusicPortal'
 import { GoatPuzzlePortal } from './games/goat-sanctuary/src/games/goat-bamboo-sanctuary/GoatPuzzlePortal'
 import { JigsawPortal } from './games/jigsaw puzzle/src/games/simple-jigsaw/JigsawPortal'
+import { SortMatchPortal } from './games/sort-match-working-project/src/games/sort-match/SortMatchPortal'
+import { PairsPortal } from './games/pairs-working-project/src/games/pairs-concentration/PairsPortal'
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type AppFlow = 'onboarding' | 'portal'
@@ -22,6 +24,8 @@ type Screen =
   | 'game-folk-music'
   | 'game-goat-sanctuary' 
   | 'game-jigsaw'
+  | 'game-sort-match'
+  | 'game-pairs'
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const ONBOARD_LANGUAGES = [
@@ -1600,7 +1604,64 @@ function GamesScreen({ onNavigate, onBack }: {
         <p className="mb-4 text-xs font-bold uppercase tracking-widest" style={{ color: '#8499BC', fontFamily: 'DM Sans, sans-serif' }}>Choose a Game</p>
 
         {/* Featured games */}
+
         <div className="flex flex-col gap-4">
+          {/* Memory Pairs */}
+          <button
+            onClick={() => onNavigate('game-pairs')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{ background: '#7C3AED' }}
+          >
+            <div className="p-5">
+              <div className="mb-3 text-4xl">🧠</div>
+
+              <h2 className="text-xl font-extrabold text-white">
+                Memory Pairs
+              </h2>
+
+              <p
+                className="mt-1 text-sm font-medium"
+                style={{
+                  color: '#EDE9FE',
+                  fontFamily: 'DM Sans, sans-serif',
+                }}
+              >
+                Find matching pairs and exercise your memory.
+              </p>
+
+              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
+                ▶ Start Game
+              </div>
+            </div>
+          </button>
+          {/* Sort & Match */}
+          <button
+            onClick={() => onNavigate('game-sort-match')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{ background: '#D97706' }}
+          >
+            <div className="p-5">
+              <div className="mb-3 text-4xl">🧺</div>
+
+              <h2 className="text-xl font-extrabold text-white">
+                Sort & Match
+              </h2>
+
+              <p
+                className="mt-1 text-sm font-medium"
+                style={{
+                  color: '#FFF1D6',
+                  fontFamily: 'DM Sans, sans-serif',
+                }}
+              >
+                Sort everyday objects into the right categories.
+              </p>
+
+              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
+                ▶ Start Game
+              </div>
+            </div>
+          </button>
 {/* Jigsaw Puzzle */}
           <button
             onClick={() => onNavigate('game-jigsaw')}
@@ -2748,6 +2809,8 @@ export default function App() {
                 {screen === 'game-match' && <MatchFaceGame onBack={goBack} />}
                 {screen === 'game-coconut-mallet' && <CoconutMalletGame />}
                 {screen === 'game-jigsaw' && <JigsawPortal />}
+                {screen === 'game-pairs' && <PairsPortal />}
+                {screen === 'game-sort-match' && <SortMatchPortal />}
                 {screen === 'game-goat-sanctuary' && <GoatPuzzlePortal />}
                 {screen === 'game-folk-music' && <FolkMusicPortal />}
                 {screen === 'family' && <FamilyPortalScreen onNavigate={navigate} onBack={goBack} language={selectedLanguage} />}
