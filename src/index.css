@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+@theme inline {
+  --color-ivory: #FBF8F0;
+  --color-butter: #F1E3A4;
+  --color-navy: #1D2B49;
+  --color-cobalt: #355FC7;
+  --color-terracotta: #C4622D;
+  --color-bamboo: #4A7C59;
+  --color-sand: #EFE0C8;
+  --font-sans: 'Nunito', sans-serif;
+  --font-ui: 'DM Sans', sans-serif;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  font-size: 20px;
+  background: #e8e0d4;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.6; }
+  70% { transform: scale(1.4); opacity: 0; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+@keyframes pulse-ring2 {
+  0% { transform: scale(1); opacity: 0.4; }
+  70% { transform: scale(1.6); opacity: 0; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+.mic-pulse::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 999px;
+  background: #355FC7;
+  animation: pulse-ring 2s ease-out infinite;
+  z-index: -1;
+}
+
+.mic-pulse::after {
+  content: '';
+  position: absolute;
+  inset: -16px;
+  border-radius: 999px;
+  background: #355FC7;
+  animation: pulse-ring2 2s ease-out infinite 0.3s;
+  z-index: -1;
+}
+
+@keyframes float-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.card-appear {
+  animation: float-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.card-appear:nth-child(1) { animation-delay: 0.05s; }
+.card-appear:nth-child(2) { animation-delay: 0.15s; }
+.card-appear:nth-child(3) { animation-delay: 0.25s; }
+
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Bamboo texture subtle pattern */
+.bamboo-texture {
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 18px,
+    rgba(74, 124, 89, 0.06) 18px,
+    rgba(74, 124, 89, 0.06) 19px
+  );
+}

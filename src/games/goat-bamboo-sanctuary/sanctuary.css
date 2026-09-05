@@ -1,0 +1,16 @@
+/* Gentle success pulse for a goat arriving home — soft, slow, no bounce. */
+@keyframes sanctuary-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(74, 124, 89, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(74, 124, 89, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(74, 124, 89, 0);
+  }
+}
+
+.sanctuary-pulse {
+  animation: sanctuary-pulse 0.9s ease-out;
+}
