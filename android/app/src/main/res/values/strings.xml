@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name">MemorySaathi</string>
-    <string name="title_activity_main">MemorySaathi</string>
+    <string name="title_activity_main">MemorySaathi</string>
     <string name="package_name">com.eurus.memorysaathi</string>
     <string name="custom_url_scheme">com.eurus.memorysaathi</string>
 </resources>
