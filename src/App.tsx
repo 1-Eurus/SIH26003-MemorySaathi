@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-
+import { GamePortal as CoconutMalletGame } from './games/coconut-mallet'
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type AppFlow = 'onboarding' | 'portal'
@@ -11,11 +11,11 @@ type Screen =
   | 'games'
   | 'game-tree'
   | 'game-match'
+  | 'game-coconut-mallet'
   | 'family'
   | 'family-analytics'
   | 'family-photos'
   | 'care'
-
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const ONBOARD_LANGUAGES = [
@@ -1579,30 +1579,62 @@ function GamesScreen({ onNavigate, onBack, micActive, onMicToggle }: {
         {/* Featured games */}
         <div className="flex flex-col gap-4">
           {/* Family Tree */}
+                    {/* Family Tree */}
           <button
             onClick={() => onNavigate('game-tree')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{ background: '#4A7C59' }}
+          >
+            <div className="p-5">
+              <div className="mb-3 text-4xl">🌳</div>
+
+              <h2 className="text-xl font-extrabold text-white">
+                Family Tree Builder
+              </h2>
+
+              <p
+                className="mt-1 text-sm font-medium"
+                style={{
+                  color: '#E1F0E4',
+                  fontFamily: 'DM Sans, sans-serif',
+                }}
+              >
+                Build and explore your family tree.
+              </p>
+
+              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
+                ▶ Start Game
+              </div>
+            </div>
+          </button>
+          {/* Coconut Mallet */}
+          <button
+            onClick={() => onNavigate('game-coconut-mallet')}
             className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
             style={{ background: '#355FC7' }}
           >
             <div className="p-5">
-              <div className="flex items-start justify-between">
-                <div>
-                  <span className="mb-2 block text-4xl">🌳</span>
-                  <h2 className="text-xl font-extrabold" style={{ color: '#FBF8F0' }}>Family Tree Builder</h2>
-                  <p className="mt-1 text-sm font-semibold leading-snug" style={{ color: 'rgba(241,227,164,0.85)' }}>
-                    Tap & place family photos into the right branches of your family tree
-                  </p>
-                </div>
-                <span className="ml-3 shrink-0 rounded-full px-3 py-1 text-xs font-bold" style={{ background: 'rgba(241,227,164,0.25)', color: '#F1E3A4', fontFamily: 'DM Sans, sans-serif' }}>Easy</span>
+              <div className="mb-3 text-4xl">🥥</div>
+
+              <h2 className="text-xl font-extrabold text-white">
+                Coconut Mallet
+              </h2>
+
+              <p
+                className="mt-1 text-sm font-medium"
+                style={{
+                  color: '#D8E3FF',
+                  fontFamily: 'DM Sans, sans-serif',
+                }}
+              >
+                Tap and drag to play this fun coordination game.
+              </p>
+
+              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
+                ▶ Start Game
               </div>
-              <div className="mt-4 flex gap-2">
-                {['🎵 Audio prompts', '🗣 Local language', '✨ Animations'].map(f => (
-                  <span key={f} className="rounded-full px-2 py-1 text-xs font-semibold" style={{ background: 'rgba(255,255,255,0.12)', color: '#FBF8F0', fontFamily: 'DM Sans, sans-serif' }}>{f}</span>
-                ))}
-              </div>
-              <div className="mt-4 rounded-xl py-3 text-center text-base font-extrabold" style={{ background: '#F1E3A4', color: '#1D2B49' }}>▶  Start Game</div>
             </div>
-          </button>
+</button>
 
           {/* Match Face */}
           <button
@@ -2701,6 +2733,7 @@ export default function App() {
                   {screen === 'games' && <GamesScreen onNavigate={navigate} onBack={goBack} {...mic} />}
                   {screen === 'game-tree' && <FamilyTreeGame onBack={goBack} {...mic} />}
                   {screen === 'game-match' && <MatchFaceGame onBack={goBack} {...mic} />}
+                  {screen === 'game-coconut-mallet' && <CoconutMalletGame />}
                   {screen === 'family' && <FamilyPortalScreen onNavigate={navigate} onBack={goBack} {...mic} />}
                   {screen === 'family-analytics' && <AnalyticsDashboard onBack={goBack} {...mic} />}
                   {screen === 'family-photos' && <PhotoManager onBack={goBack} {...mic} />}
