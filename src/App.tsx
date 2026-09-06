@@ -3054,6 +3054,7 @@ export default function App() {
           // PORTAL FLOW
           <>
             {showPinScreen ? (
+
               <PinVerificationScreen
                 onSuccess={() => {
                   setShowPinScreen(false)
@@ -3064,9 +3065,13 @@ export default function App() {
                 correctPin={pin}
                 language={selectedLanguage}
               />
+
             ) : (
+
               <>
-                <div className="flex-1 min-h-0 overflow-y-auto pb-24">
+                {/* Scrollable game/content area */}
+                <div className="min-h-0 flex-1 overflow-y-auto pb-24">
+
                   {screen === 'home' && (
                     <HomeScreen
                       onNavigate={navigate}
@@ -3074,13 +3079,50 @@ export default function App() {
                       language={selectedLanguage}
                     />
                   )}
-                  {screen === 'games' && <GamesScreen onNavigate={navigate} onBack={() => navTab('home')} />}
-                  {screen === 'game-tree' && <FamilyTreeGame onBack={goBack} />}
-                  {screen === 'game-match' && <MatchFaceGame onBack={goBack} />}
+
+                  {screen === 'games' && (
+                    <GamesScreen
+                      onNavigate={navigate}
+                      onBack={goBack}
+                    />
+                  )}
+
+                  {screen === 'game-tree' && (
+                    <FamilyTreeGame onBack={goBack} />
+                  )}
+
+                  {screen === 'game-match' && (
+                    <MatchFaceGame onBack={goBack} />
+                  )}
+
+                  {screen === 'game-coconut-mallet' && (
+                    <CoconutMalletGame />
+                  )}
+
+                  {screen === 'game-jigsaw' && (
+                    <JigsawPortal />
+                  )}
+
+                  {screen === 'game-pairs' && (
+                    <PairsPortal />
+                  )}
+
+                  {screen === 'game-sort-match' && (
+                    <SortMatchPortal />
+                  )}
+
+                  {screen === 'game-goat-sanctuary' && (
+                    <GoatPuzzlePortal />
+                  )}
+
+                  {screen === 'game-folk-music' && (
+                    <FolkMusicPortal />
+                  )}
+
                   {screen === 'family' && (
                     <FamilyPortalScreen
                       onNavigate={navigate}
-                      onBack={() => navTab('home')}
+                      onBack={goBack}
                       language={selectedLanguage}
                       caretakerName={caretakerName}
                       familyContacts={familyContacts}
@@ -3093,18 +3135,22 @@ export default function App() {
                       onRemovePersonalContact={removePersonalContact}
                     />
                   )}
-                  {screen === 'games' && <GamesScreen onNavigate={navigate} onBack={goBack} />}
-                  {screen === 'game-tree' && <FamilyTreeGame onBack={goBack} />}
-                  {screen === 'game-match' && <MatchFaceGame onBack={goBack} />}
-                  {screen === 'game-coconut-mallet' && <CoconutMalletGame />}
-                  {screen === 'game-jigsaw' && <JigsawPortal />}
-                  {screen === 'game-pairs' && <PairsPortal />}
-                  {screen === 'game-sort-match' && <SortMatchPortal />}
-                  {screen === 'game-goat-sanctuary' && <GoatPuzzlePortal />}
-                  {screen === 'game-folk-music' && <FolkMusicPortal />}
-                  {screen === 'family' && <FamilyPortalScreen onNavigate={navigate} onBack={goBack} language={selectedLanguage} />}
-                  {screen === 'family-analytics' && <AnalyticsDashboard onBack={goBack} language={selectedLanguage} />}
-                  {screen === 'family-photos' && <PhotoManager onBack={goBack} language={selectedLanguage} onLanguageChange={setSelectedLanguage} />}
+
+                  {screen === 'family-analytics' && (
+                    <AnalyticsDashboard
+                      onBack={goBack}
+                      language={selectedLanguage}
+                    />
+                  )}
+
+                  {screen === 'family-photos' && (
+                    <PhotoManager
+                      onBack={goBack}
+                      language={selectedLanguage}
+                      onLanguageChange={setSelectedLanguage}
+                    />
+                  )}
+
                   {screen === 'care' && (
                     <CareScreen
                       onBack={() => navTab('home')}
@@ -3113,14 +3159,27 @@ export default function App() {
                       personalContacts={personalContacts}
                     />
                   )}
+
                 </div>
 
-                <BottomNav screen={screen} onNavigate={navTab} />
+                {/* Fixed bottom navigation */}
+                <BottomNav
+                  screen={screen}
+                  onNavigate={navTab}
+                />
 
-                <div className="flex shrink-0 justify-center pb-2" style={{ background: '#F7F3E8' }}>
-                  <div className="h-1 w-28 rounded-full" style={{ background: '#1E3B4022' }} />
+                {/* Phone home indicator */}
+                <div
+                  className="flex shrink-0 justify-center pb-2"
+                  style={{ background: '#F7F3E8' }}
+                >
+                  <div
+                    className="h-1 w-28 rounded-full"
+                    style={{ background: '#1E3B4022' }}
+                  />
                 </div>
               </>
+
             )}
           </>
         )}
