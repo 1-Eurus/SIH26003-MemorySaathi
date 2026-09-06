@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useMemo, useCallback, lazy, Suspense } from 'react'
-import { fetchMsgs, insertMsg, type Msg } from '../utils/supabase/client'
-
-const CoconutMalletGame = lazy(() => import('./games/coconut-mallet/src/games/coconut-mallet/GamePortal.tsx').then(m => ({ default: m.GamePortal })))
-const FolkMusicPortal = lazy(() => import('./games/folk-music-portal/FolkMusicPortal').then(m => ({ default: m.FolkMusicPortal })))
-const GoatPuzzlePortal = lazy(() => import('./games/goat-sanctuary/src/games/goat-bamboo-sanctuary/GoatPuzzlePortal.tsx').then(m => ({ default: m.GoatPuzzlePortal })))
+import { GamePortal as CoconutMalletGame } from './games/coconut-mallet/src/games/coconut-mallet/GamePortal'
+import { JigsawPortal } from './games/jigsaw puzzle/src/games/simple-jigsaw/JigsawPortal'
+import { PairsPortal } from './games/pairs-working-project/src/games/pairs-concentration/PairsPortal'
+import { SortMatchPortal } from './games/sort-match-working-project/src/games/sort-match/SortMatchPortal'
+import { GoatPuzzlePortal } from './games/goat-sanctuary/src/games/goat-bamboo-sanctuary/GoatPuzzlePortal'
+import { FolkMusicPortal } from './games/folk-music-portal/FolkMusicPortal'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -17,16 +18,15 @@ type Screen =
   | 'game-tree'
   | 'game-match'
   | 'game-coconut-mallet'
+  | 'game-jigsaw'
+  | 'game-pairs'
+  | 'game-sort-match'
+  | 'game-goat-sanctuary'
+  | 'game-folk-music'
   | 'family'
   | 'family-analytics'
   | 'family-photos'
   | 'care'
-  | 'game-folk-music'
-  | 'game-goat-sanctuary' 
-  | 'game-jigsaw'
-  | 'game-sort-match'
-  | 'game-pairs'
-
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const ONBOARD_LANGUAGES = [
@@ -1738,159 +1738,41 @@ function ComingSoonScreen({ title, onBack }: { title: string; onBack: () => void
 
 // ─── GAMES SELECTION ──────────────────────────────────────────────────────────
 
-function GamesScreen({ onNavigate, onBack }: {
-  onNavigate: (s: Screen) => void; onBack: () => void;
+function GamesScreen({
+  onNavigate,
+  onBack,
+}: {
+  onNavigate: (s: Screen) => void
+  onBack: () => void
 }) {
   return (
-    <div className="flex h-full flex-col" style={{ background: '#F7F3E8' }}>
-      <ScreenHeader title="Games Portal" subtitle="Let's Play" bg="#2F6E7D" onBack={onBack} showBrand />
+    <div
+      className="flex h-full flex-col"
+      style={{ background: '#F7F3E8' }}
+    >
+      <ScreenHeader
+        title="Games Portal"
+        subtitle="Let's Play"
+        bg="#2F6E7D"
+        onBack={onBack}
+        showBrand
+      />
 
       <div className="scrollbar-hide flex-1 overflow-y-auto px-5 pb-6 pt-5">
-        <p className="mb-4 text-xs font-bold uppercase tracking-widest" style={{ color: '#6F93A0', fontFamily: 'DM Sans, sans-serif' }}>Choose a Game</p>
 
-        {/* Featured games */}
+        <p
+          className="mb-4 text-xs font-bold uppercase tracking-widest"
+          style={{
+            color: '#6F93A0',
+            fontFamily: 'DM Sans, sans-serif',
+          }}
+        >
+          Choose a Game
+        </p>
+
         <div className="flex flex-col gap-4">
-          {/* Memory Pairs */}
-          <button
-            onClick={() => onNavigate('game-pairs')}
-            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
-            style={{ background: '#7C3AED' }}
-          >
-            <div className="p-5">
-              <div className="mb-3 text-4xl">🧠</div>
 
-              <h2 className="text-xl font-extrabold text-white">
-                Memory Pairs
-              </h2>
-
-              <p
-                className="mt-1 text-sm font-medium"
-                style={{
-                  color: '#EDE9FE',
-                  fontFamily: 'DM Sans, sans-serif',
-                }}
-              >
-                Find matching pairs and exercise your memory.
-              </p>
-
-              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
-                ▶ Start Game
-              </div>
-            </div>
-          </button>
-          {/* Sort & Match */}
-          <button
-            onClick={() => onNavigate('game-sort-match')}
-            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
-            style={{ background: '#D97706' }}
-          >
-            <div className="p-5">
-              <div className="mb-3 text-4xl">🧺</div>
-
-              <h2 className="text-xl font-extrabold text-white">
-                Sort & Match
-              </h2>
-
-              <p
-                className="mt-1 text-sm font-medium"
-                style={{
-                  color: '#FFF1D6',
-                  fontFamily: 'DM Sans, sans-serif',
-                }}
-              >
-                Sort everyday objects into the right categories.
-              </p>
-
-              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
-                ▶ Start Game
-              </div>
-            </div>
-          </button> 
-{/* Jigsaw Puzzle */}
-          <button
-            onClick={() => onNavigate('game-jigsaw')}
-            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
-            style={{ background: '#7B5EA7' }}
-          >
-            <div className="p-5">
-              <div className="mb-3 text-4xl">🧩</div>
-
-              <h2 className="text-xl font-extrabold text-white">
-                Jigsaw Puzzle
-              </h2>
-
-              <p
-                className="mt-1 text-sm font-medium"
-                style={{
-                  color: '#EEE5F8',
-                  fontFamily: 'DM Sans, sans-serif',
-                }}
-              >
-                Piece together the picture and exercise your memory.
-              </p>
-
-              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
-                ▶ Start Game
-              </div>
-            </div>
-          </button>
-          {/* Goat & Bamboo Sanctuary */}
-          <button
-            onClick={() => onNavigate('game-goat-sanctuary')}
-            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
-            style={{ background: '#4A7C59' }}
-          >
-            <div className="p-5">
-              <div className="mb-3 text-4xl">🐐</div>
-
-              <h2 className="text-xl font-extrabold text-white">
-                Goat & Bamboo Sanctuary
-              </h2>
-
-              <p
-                className="mt-1 text-sm font-medium"
-                style={{
-                  color: '#E1F0E4',
-                  fontFamily: 'DM Sans, sans-serif',
-                }}
-              >
-                Solve the puzzle and guide the goat through the bamboo sanctuary.
-              </p>
-
-              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
-                ▶ Start Game
-              </div>
-            </div>
-          </button>
-          {/* North-East Folk Music */}
-          <button
-            onClick={() => onNavigate('game-folk-music')}
-            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
-            style={{ background: '#355FC7' }}
-          >
-            <div className="p-5">
-              <div className="mb-3 text-4xl">🎵</div>
-
-              <h2 className="text-xl font-extrabold text-white">
-                North-East Folk Music
-              </h2>
-
-              <p
-                className="mt-1 text-sm font-medium"
-                style={{
-                  color: '#DCE6FF',
-                  fontFamily: 'DM Sans, sans-serif',
-                }}
-              >
-                Listen to traditional music and match it with its story.
-              </p>
-
-              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
-                ▶ Start Game
-              </div>
-            </div>
-          </button>          
-          {/* Family Tree */}
+          {/* FAMILY TREE */}
           <button
             onClick={() => onNavigate('game-tree')}
             className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
@@ -1900,81 +1782,583 @@ function GamesScreen({ onNavigate, onBack }: {
               <div className="flex items-start justify-between">
                 <div>
                   <span className="mb-2 block text-4xl">🌳</span>
-                  <h2 className="text-xl font-extrabold" style={{ color: '#FBF8F0' }}>Family Tree Builder</h2>
-                  <p className="mt-1 text-sm font-semibold leading-snug" style={{ color: 'rgba(241,227,164,0.85)' }}>
+
+                  <h2
+                    className="text-xl font-extrabold"
+                    style={{ color: '#FBF8F0' }}
+                  >
+                    Family Tree Builder
+                  </h2>
+
+                  <p
+                    className="mt-1 text-sm font-semibold leading-snug"
+                    style={{ color: 'rgba(241,227,164,0.85)' }}
+                  >
                     Tap & place family photos into the right branches of your family tree
                   </p>
                 </div>
-                <span className="ml-3 shrink-0 rounded-full px-3 py-1 text-xs font-bold" style={{ background: 'rgba(241,227,164,0.25)', color: '#F1E3A4', fontFamily: 'DM Sans, sans-serif' }}>Easy</span>
-              </div>
-              <div className="mt-4 flex gap-2">
-                {['🎵 Audio prompts', '🗣 Local language', '✨ Animations'].map(f => (
-                  <span key={f} className="rounded-full px-2 py-1 text-xs font-semibold" style={{ background: 'rgba(255,255,255,0.12)', color: '#FBF8F0', fontFamily: 'DM Sans, sans-serif' }}>{f}</span>
-                ))}
-              </div>
-              <div className="mt-4 rounded-xl py-3 text-center text-base font-extrabold" style={{ background: '#F1E3A4', color: '#1D2B49' }}>▶  Start Game</div>
-            </div>
-          </button>
-{/* Coconut Mallet */}
-          <button
-            onClick={() => onNavigate('game-coconut-mallet')}
-            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
-            style={{ background: '#355FC7' }}
-          >
-            <div className="p-5">
-              <div className="mb-3 text-4xl">🥥</div>
 
-              <h2 className="text-xl font-extrabold text-white">
-                Coconut Mallet
-              </h2>
+                <span
+                  className="ml-3 shrink-0 rounded-full px-3 py-1 text-xs font-bold"
+                  style={{
+                    background: 'rgba(241,227,164,0.25)',
+                    color: '#F1E3A4',
+                    fontFamily: 'DM Sans, sans-serif',
+                  }}
+                >
+                  Easy
+                </span>
+              </div>
 
-              <p
-                className="mt-1 text-sm font-medium"
+              <div className="mt-4 flex flex-wrap gap-2">
+                {['🎵 Audio prompts', '🗣 Local language', '✨ Animations'].map(
+                  (f) => (
+                    <span
+                      key={f}
+                      className="rounded-full px-2 py-1 text-xs font-semibold"
+                      style={{
+                        background: 'rgba(255,255,255,0.12)',
+                        color: '#FBF8F0',
+                        fontFamily: 'DM Sans, sans-serif',
+                      }}
+                    >
+                      {f}
+                    </span>
+                  )
+                )}
+              </div>
+
+              <div
+                className="mt-4 rounded-xl py-3 text-center text-base font-extrabold"
                 style={{
-                  color: '#D8E3FF',
-                  fontFamily: 'DM Sans, sans-serif',
+                  background: '#F1E3A4',
+                  color: '#1D2B49',
                 }}
               >
-                Tap and drag to play this fun coordination game.
-              </p>
-
-              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
-                ▶ Start Game
+                ▶ &nbsp;Start Game
               </div>
             </div>
-</button>
+          </button>
 
-          {/* Match Face */}
+
+          {/* MATCH FACE */}
           <button
             onClick={() => onNavigate('game-match')}
             className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
-            style={{ background: '#EAD9AE', border: '1.5px solid #D4C47A' }}
+            style={{
+              background: '#EAD9AE',
+              border: '1.5px solid #D4C47A',
+            }}
           >
             <div className="p-5">
               <div className="flex items-start justify-between">
                 <div>
                   <span className="mb-2 block text-4xl">🃏</span>
-                  <h2 className="text-xl font-extrabold" style={{ color: '#1E3B40' }}>Match Face to Name</h2>
-                  <p className="mt-1 text-sm font-semibold leading-snug" style={{ color: '#5A6F5A' }}>
+
+                  <h2
+                    className="text-xl font-extrabold"
+                    style={{ color: '#1E3B40' }}
+                  >
+                    Match Face to Name
+                  </h2>
+
+                  <p
+                    className="mt-1 text-sm font-semibold leading-snug"
+                    style={{ color: '#5A6F5A' }}
+                  >
                     See a family photo and tap the correct name from 3 large buttons
                   </p>
                 </div>
-                <span className="ml-3 shrink-0 rounded-full px-3 py-1 text-xs font-bold" style={{ background: 'rgba(94,140,110,0.18)', color: '#5E8C6E', fontFamily: 'DM Sans, sans-serif' }}>Medium</span>
+
+                <span
+                  className="ml-3 shrink-0 rounded-full px-3 py-1 text-xs font-bold"
+                  style={{
+                    background: 'rgba(94,140,110,0.18)',
+                    color: '#5E8C6E',
+                    fontFamily: 'DM Sans, sans-serif',
+                  }}
+                >
+                  Medium
+                </span>
               </div>
+
               <div className="mt-4 flex flex-wrap gap-2">
-                {['👂 Voice hints', '💬 Encouragement', '🔄 Adaptive'].map(f => (
-                  <span key={f} className="rounded-full px-2 py-1 text-xs font-semibold" style={{ background: 'rgba(47,110,125,0.1)', color: '#2F6E7D', fontFamily: 'DM Sans, sans-serif' }}>{f}</span>
-                ))}
+                {['👂 Voice hints', '💬 Encouragement', '🔄 Adaptive'].map(
+                  (f) => (
+                    <span
+                      key={f}
+                      className="rounded-full px-2 py-1 text-xs font-semibold"
+                      style={{
+                        background: 'rgba(47,110,125,0.1)',
+                        color: '#2F6E7D',
+                        fontFamily: 'DM Sans, sans-serif',
+                      }}
+                    >
+                      {f}
+                    </span>
+                  )
+                )}
               </div>
-              <div className="mt-4 rounded-xl py-3 text-center text-base font-extrabold" style={{ background: '#1E3B40', color: '#E8D48A' }}>▶  Start Game</div>
+
+              <div
+                className="mt-4 rounded-xl py-3 text-center text-base font-extrabold"
+                style={{
+                  background: '#1E3B40',
+                  color: '#E8D48A',
+                }}
+              >
+                ▶ &nbsp;Start Game
+              </div>
             </div>
           </button>
 
-          {/* More games coming */}
-          <div className="rounded-2xl p-4" style={{ background: '#FFF', border: '1.5px solid #DDD3B0' }}>
-            <p className="text-center text-sm font-bold" style={{ color: '#6F93A0' }}>🎵 NE Music Quiz &nbsp;·&nbsp; 🔤 Assamese Words</p>
-            <p className="mt-1 text-center text-xs font-semibold" style={{ color: '#C97A3D', fontFamily: 'DM Sans, sans-serif' }}>Coming soon · Upload photos to unlock</p>
+
+          {/* COCONUT MALLET */}
+          <button
+            onClick={() => onNavigate('game-coconut-mallet')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{
+              background: '#EAD9AE',
+              border: '1.5px solid #D4C47A',
+            }}
+          >
+            <div className="p-5">
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="mb-2 block text-4xl">🥥</span>
+
+                  <h2
+                    className="text-xl font-extrabold"
+                    style={{ color: '#1E3B40' }}
+                  >
+                    Coconut Mallet
+                  </h2>
+
+                  <p
+                    className="mt-1 text-sm font-semibold leading-snug"
+                    style={{ color: '#5A6F5A' }}
+                  >
+                    A fun reflex game where you tap coconuts with the mallet
+                  </p>
+                </div>
+
+                <span
+                  className="ml-3 shrink-0 rounded-full px-3 py-1 text-xs font-bold"
+                  style={{
+                    background: 'rgba(94,140,110,0.18)',
+                    color: '#5E8C6E',
+                    fontFamily: 'DM Sans, sans-serif',
+                  }}
+                >
+                  Easy
+                </span>
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {['🥥 Tap to play', '✨ Animations', '🏆 Score'].map((f) => (
+                  <span
+                    key={f}
+                    className="rounded-full px-2 py-1 text-xs font-semibold"
+                    style={{
+                      background: 'rgba(47,110,125,0.1)',
+                      color: '#2F6E7D',
+                      fontFamily: 'DM Sans, sans-serif',
+                    }}
+                  >
+                    {f}
+                  </span>
+                ))}
+              </div>
+
+              <div
+                className="mt-4 rounded-xl py-3 text-center text-base font-extrabold"
+                style={{
+                  background: '#1E3B40',
+                  color: '#E8D48A',
+                }}
+              >
+                ▶ &nbsp;Start Game
+              </div>
+            </div>
+          </button>
+
+
+          {/* JIGSAW */}
+          <button
+            onClick={() => onNavigate('game-jigsaw')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{
+              background: '#EAD9AE',
+              border: '1.5px solid #D4C47A',
+            }}
+          >
+            <div className="p-5">
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="mb-2 block text-4xl">🧩</span>
+
+                  <h2
+                    className="text-xl font-extrabold"
+                    style={{ color: '#1E3B40' }}
+                  >
+                    Jigsaw Puzzle
+                  </h2>
+
+                  <p
+                    className="mt-1 text-sm font-semibold leading-snug"
+                    style={{ color: '#5A6F5A' }}
+                  >
+                    Piece together familiar pictures and memories
+                  </p>
+                </div>
+
+                <span
+                  className="ml-3 shrink-0 rounded-full px-3 py-1 text-xs font-bold"
+                  style={{
+                    background: 'rgba(94,140,110,0.18)',
+                    color: '#5E8C6E',
+                    fontFamily: 'DM Sans, sans-serif',
+                  }}
+                >
+                  Easy
+                </span>
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {['🧩 Puzzles', '🖼 Memories', '✨ Relaxing'].map((f) => (
+                  <span
+                    key={f}
+                    className="rounded-full px-2 py-1 text-xs font-semibold"
+                    style={{
+                      background: 'rgba(47,110,125,0.1)',
+                      color: '#2F6E7D',
+                      fontFamily: 'DM Sans, sans-serif',
+                    }}
+                  >
+                    {f}
+                  </span>
+                ))}
+              </div>
+
+              <div
+                className="mt-4 rounded-xl py-3 text-center text-base font-extrabold"
+                style={{
+                  background: '#1E3B40',
+                  color: '#E8D48A',
+                }}
+              >
+                ▶ &nbsp;Start Game
+              </div>
+            </div>
+          </button>
+
+
+          {/* MEMORY PAIRS */}
+          <button
+            onClick={() => onNavigate('game-pairs')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{
+              background: '#EAD9AE',
+              border: '1.5px solid #D4C47A',
+            }}
+          >
+            <div className="p-5">
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="mb-2 block text-4xl">🃏</span>
+
+                  <h2
+                    className="text-xl font-extrabold"
+                    style={{ color: '#1E3B40' }}
+                  >
+                    Memory Pairs
+                  </h2>
+
+                  <p
+                    className="mt-1 text-sm font-semibold leading-snug"
+                    style={{ color: '#5A6F5A' }}
+                  >
+                    Find matching pairs and exercise your memory
+                  </p>
+                </div>
+
+                <span
+                  className="ml-3 shrink-0 rounded-full px-3 py-1 text-xs font-bold"
+                  style={{
+                    background: 'rgba(94,140,110,0.18)',
+                    color: '#5E8C6E',
+                    fontFamily: 'DM Sans, sans-serif',
+                  }}
+                >
+                  Medium
+                </span>
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {['🧠 Memory', '🔄 Matching', '🏆 Score'].map((f) => (
+                  <span
+                    key={f}
+                    className="rounded-full px-2 py-1 text-xs font-semibold"
+                    style={{
+                      background: 'rgba(47,110,125,0.1)',
+                      color: '#2F6E7D',
+                      fontFamily: 'DM Sans, sans-serif',
+                    }}
+                  >
+                    {f}
+                  </span>
+                ))}
+              </div>
+
+              <div
+                className="mt-4 rounded-xl py-3 text-center text-base font-extrabold"
+                style={{
+                  background: '#1E3B40',
+                  color: '#E8D48A',
+                }}
+              >
+                ▶ &nbsp;Start Game
+              </div>
+            </div>
+          </button>
+
+
+          {/* SORT & MATCH */}
+          <button
+            onClick={() => onNavigate('game-sort-match')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{
+              background: '#EAD9AE',
+              border: '1.5px solid #D4C47A',
+            }}
+          >
+            <div className="p-5">
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="mb-2 block text-4xl">🔤</span>
+
+                  <h2
+                    className="text-xl font-extrabold"
+                    style={{ color: '#1E3B40' }}
+                  >
+                    Sort & Match
+                  </h2>
+
+                  <p
+                    className="mt-1 text-sm font-semibold leading-snug"
+                    style={{ color: '#5A6F5A' }}
+                  >
+                    Sort objects and match them with the right category
+                  </p>
+                </div>
+
+                <span
+                  className="ml-3 shrink-0 rounded-full px-3 py-1 text-xs font-bold"
+                  style={{
+                    background: 'rgba(94,140,110,0.18)',
+                    color: '#5E8C6E',
+                    fontFamily: 'DM Sans, sans-serif',
+                  }}
+                >
+                  Easy
+                </span>
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {['🔤 Sorting', '🎯 Matching', '✨ Interactive'].map((f) => (
+                  <span
+                    key={f}
+                    className="rounded-full px-2 py-1 text-xs font-semibold"
+                    style={{
+                      background: 'rgba(47,110,125,0.1)',
+                      color: '#2F6E7D',
+                      fontFamily: 'DM Sans, sans-serif',
+                    }}
+                  >
+                    {f}
+                  </span>
+                ))}
+              </div>
+
+              <div
+                className="mt-4 rounded-xl py-3 text-center text-base font-extrabold"
+                style={{
+                  background: '#1E3B40',
+                  color: '#E8D48A',
+                }}
+              >
+                ▶ &nbsp;Start Game
+              </div>
+            </div>
+          </button>
+
+
+          {/* GOAT BAMBOO SANCTUARY */}
+          <button
+            onClick={() => onNavigate('game-goat-sanctuary')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{
+              background: '#EAD9AE',
+              border: '1.5px solid #D4C47A',
+            }}
+          >
+            <div className="p-5">
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="mb-2 block text-4xl">🐐</span>
+
+                  <h2
+                    className="text-xl font-extrabold"
+                    style={{ color: '#1E3B40' }}
+                  >
+                    Goat Bamboo Sanctuary
+                  </h2>
+
+                  <p
+                    className="mt-1 text-sm font-semibold leading-snug"
+                    style={{ color: '#5A6F5A' }}
+                  >
+                    Explore a playful North-East inspired bamboo sanctuary
+                  </p>
+                </div>
+
+                <span
+                  className="ml-3 shrink-0 rounded-full px-3 py-1 text-xs font-bold"
+                  style={{
+                    background: 'rgba(94,140,110,0.18)',
+                    color: '#5E8C6E',
+                    fontFamily: 'DM Sans, sans-serif',
+                  }}
+                >
+                  Easy
+                </span>
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {['🐐 Goats', '🎋 Bamboo', '🌿 Explore'].map((f) => (
+                  <span
+                    key={f}
+                    className="rounded-full px-2 py-1 text-xs font-semibold"
+                    style={{
+                      background: 'rgba(47,110,125,0.1)',
+                      color: '#2F6E7D',
+                      fontFamily: 'DM Sans, sans-serif',
+                    }}
+                  >
+                    {f}
+                  </span>
+                ))}
+              </div>
+
+              <div
+                className="mt-4 rounded-xl py-3 text-center text-base font-extrabold"
+                style={{
+                  background: '#1E3B40',
+                  color: '#E8D48A',
+                }}
+              >
+                ▶ &nbsp;Start Game
+              </div>
+            </div>
+          </button>
+
+
+          {/* FOLK MUSIC */}
+          <button
+            onClick={() => onNavigate('game-folk-music')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{
+              background: '#EAD9AE',
+              border: '1.5px solid #D4C47A',
+            }}
+          >
+            <div className="p-5">
+              <div className="flex items-start justify-between">
+                <div>
+                  <span className="mb-2 block text-4xl">🎵</span>
+
+                  <h2
+                    className="text-xl font-extrabold"
+                    style={{ color: '#1E3B40' }}
+                  >
+                    Folk Music
+                  </h2>
+
+                  <p
+                    className="mt-1 text-sm font-semibold leading-snug"
+                    style={{ color: '#5A6F5A' }}
+                  >
+                    Listen to familiar folk sounds and match them with their stories
+                  </p>
+                </div>
+
+                <span
+                  className="ml-3 shrink-0 rounded-full px-3 py-1 text-xs font-bold"
+                  style={{
+                    background: 'rgba(94,140,110,0.18)',
+                    color: '#5E8C6E',
+                    fontFamily: 'DM Sans, sans-serif',
+                  }}
+                >
+                  Medium
+                </span>
+              </div>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {['🎵 Audio', '🗣 Local culture', '🧠 Memory'].map((f) => (
+                  <span
+                    key={f}
+                    className="rounded-full px-2 py-1 text-xs font-semibold"
+                    style={{
+                      background: 'rgba(47,110,125,0.1)',
+                      color: '#2F6E7D',
+                      fontFamily: 'DM Sans, sans-serif',
+                    }}
+                  >
+                    {f}
+                  </span>
+                ))}
+              </div>
+
+              <div
+                className="mt-4 rounded-xl py-3 text-center text-base font-extrabold"
+                style={{
+                  background: '#1E3B40',
+                  color: '#E8D48A',
+                }}
+              >
+                ▶ &nbsp;Start Game
+              </div>
+            </div>
+          </button>
+
+
+          {/* MORE GAMES */}
+          <div
+            className="rounded-2xl p-4"
+            style={{
+              background: '#FFF',
+              border: '1.5px solid #DDD3B0',
+            }}
+          >
+            <p
+              className="text-center text-sm font-bold"
+              style={{ color: '#6F93A0' }}
+            >
+              🎵 NE Music Quiz &nbsp;·&nbsp; 🔤 Assamese Words
+            </p>
+
+            <p
+              className="mt-1 text-center text-xs font-semibold"
+              style={{
+                color: '#C97A3D',
+                fontFamily: 'DM Sans, sans-serif',
+              }}
+            >
+              Coming soon · Upload photos to unlock
+            </p>
           </div>
+
         </div>
       </div>
     </div>
@@ -3097,31 +3481,51 @@ return (
                 </div>
               </section>
             )}
-
             {onboardStep !== "welcome" && onboardStep !== "details" && (
+
               <main
                 className="flex h-full items-center justify-center px-5 bg-gradient-to-br from-[#1E3B40] to-[#5E8C6E]"
-                style={{ paddingTop: 'max(2.5rem, env(safe-area-inset-top))', paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+                style={{
+                  paddingTop: 'max(2.5rem, env(safe-area-inset-top))',
+                  paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))'
+                }}
               >
+
                 <div className="w-full rounded-3xl bg-[#F7F3E8] p-6 text-gray-900 shadow-2xl">
+
                   {onboardStep === "pin" && (
                     <>
-                      <h2 className="text-xl font-bold text-[#1E3B40]">{t.setupPin}</h2>
-                      <p className="mt-1 text-sm text-[#6B7268]">{t.pinSubtitle}</p>
+                      <h2 className="text-xl font-bold text-[#1E3B40]">
+                        {t.setupPin}
+                      </h2>
+
+                      <p className="mt-1 text-sm text-[#6B7268]">
+                        {t.pinSubtitle}
+                      </p>
 
                       <div className="mt-6">
-                        <label className="mb-1 block text-sm font-bold text-[#1E3B40]">{t.pinLabel}</label>
+                        <label className="mb-1 block text-sm font-bold text-[#1E3B40]">
+                          {t.pinLabel}
+                        </label>
+
                         <input
                           type="password"
                           inputMode="numeric"
                           maxLength={4}
                           value={pin}
-                          onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+                          onChange={(e) =>
+                            setPin(e.target.value.replace(/\D/g, ""))
+                          }
                           placeholder={t.pinPlaceholder}
-                          className={`w-full rounded-2xl border border-[#DDD3B0] bg-white px-4 py-3 text-center text-xl font-bold text-[#1E3B40] outline-none focus:border-[#2F6E7D] ${pin.length > 0 ? 'tracking-[0.5em]' : ''}`}
+                          className={`w-full rounded-2xl border border-[#DDD3B0] bg-white px-4 py-3 text-center text-xl font-bold text-[#1E3B40] outline-none focus:border-[#2F6E7D] ${
+                            pin.length > 0 ? 'tracking-[0.5em]' : ''
+                          }`}
                         />
+
                         {pin.length > 0 && !isPinValid && (
-                          <p className="mt-2 text-xs font-bold text-[#C97A3D]">{t.invalidPin}</p>
+                          <p className="mt-2 text-xs font-bold text-[#C97A3D]">
+                            {t.invalidPin}
+                          </p>
                         )}
                       </div>
 
@@ -3132,6 +3536,7 @@ return (
                         >
                           {t.back}
                         </button>
+
                         <button
                           onClick={() => setOnboardStep("done")}
                           disabled={!isPinValid}
@@ -3146,10 +3551,19 @@ return (
                   {onboardStep === "done" && (
                     <>
                       <div className="text-center">
-                        <span className="mb-2 block text-5xl">🎉</span>
-                        <h2 className="text-xl font-extrabold text-[#1E3B40]">{t.setupComplete}</h2>
-                        <p className="mt-2 text-sm font-semibold text-[#6B7268]">{t.readyToUse}</p>
+                        <span className="mb-2 block text-5xl">
+                          🎉
+                        </span>
+
+                        <h2 className="text-xl font-extrabold text-[#1E3B40]">
+                          {t.setupComplete}
+                        </h2>
+
+                        <p className="mt-2 text-sm font-semibold text-[#6B7268]">
+                          {t.readyToUse}
+                        </p>
                       </div>
+
                       <button
                         onClick={() => setFlow("portal")}
                         className="mt-6 w-full rounded-2xl bg-[#2F6E7D] px-4 py-4 text-lg font-extrabold text-white"
@@ -3158,13 +3572,21 @@ return (
                       </button>
                     </>
                   )}
+
                 </div>
               </main>
+
             )}
+
           </div>
+
         ) : (
-          <>
+
+          // PORTAL FLOW
+          <div className="flex h-full min-h-0 flex-col overflow-hidden">
+
             {showPinScreen ? (
+
               <PinVerificationScreen
                 onSuccess={() => {
                   setShowPinScreen(false)
@@ -3175,10 +3597,14 @@ return (
                 correctPin={pin}
                 language={selectedLanguage}
               />
+
             ) : (
+
               <>
+
                 {/* Scrollable screen content */}
-                <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+                <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+
                   {screen === 'home' && (
                     <HomeScreen
                       onNavigate={navigate}
@@ -3187,48 +3613,71 @@ return (
                     />
                   )}
 
+                  {/* Games portal */}
                   {screen === 'games' && (
-                    <GamesScreen onNavigate={navigate} onBack={goBack} />
+                    <GamesScreen
+                      onNavigate={navigate}
+                      onBack={goBack}
+                    />
                   )}
 
+                  {/* Family Tree */}
                   {screen === 'game-tree' && (
-                    <FamilyTreeGame onBack={goBack} />
+                    <FamilyTreeGame
+                      onBack={goBack}
+                    />
                   )}
 
+                  {/* Match Face */}
                   {screen === 'game-match' && (
-                    <MatchFaceGame onBack={goBack} />
+                    <MatchFaceGame
+                      onBack={goBack}
+                    />
                   )}
 
+                  {/* Coconut Mallet */}
                   {screen === 'game-coconut-mallet' && (
                     <Suspense fallback={<GameLoader />}>
                       <CoconutMalletGame />
                     </Suspense>
                   )}
 
+                  {/* Jigsaw Puzzle */}
                   {screen === 'game-jigsaw' && (
-                    <ComingSoonScreen title="Jigsaw Puzzle" onBack={goBack} />
+                    <Suspense fallback={<GameLoader />}>
+                      <JigsawPortal />
+                    </Suspense>
                   )}
 
+                  {/* Memory Pairs */}
                   {screen === 'game-pairs' && (
-                    <ComingSoonScreen title="Memory Pairs" onBack={goBack} />
+                    <Suspense fallback={<GameLoader />}>
+                      <PairsPortal />
+                    </Suspense>
                   )}
 
+                  {/* Sort & Match */}
                   {screen === 'game-sort-match' && (
-                    <ComingSoonScreen title="Sort & Match" onBack={goBack} />
+                    <Suspense fallback={<GameLoader />}>
+                      <SortMatchPortal />
+                    </Suspense>
                   )}
 
+                  {/* Goat Bamboo Sanctuary */}
                   {screen === 'game-goat-sanctuary' && (
                     <Suspense fallback={<GameLoader />}>
                       <GoatPuzzlePortal />
                     </Suspense>
                   )}
 
+                  {/* Folk Music */}
                   {screen === 'game-folk-music' && (
                     <Suspense fallback={<GameLoader />}>
                       <FolkMusicPortal />
                     </Suspense>
                   )}
 
+                  {/* Family Portal */}
                   {screen === 'family' && (
                     <FamilyPortalScreen
                       onNavigate={navigate}
@@ -3246,6 +3695,7 @@ return (
                     />
                   )}
 
+                  {/* Family Analytics */}
                   {screen === 'family-analytics' && (
                     <AnalyticsDashboard
                       onBack={goBack}
@@ -3253,6 +3703,7 @@ return (
                     />
                   )}
 
+                  {/* Family Photos */}
                   {screen === 'family-photos' && (
                     <PhotoManager
                       onBack={goBack}
@@ -3261,6 +3712,7 @@ return (
                     />
                   )}
 
+                  {/* Care Screen */}
                   {screen === 'care' && (
                     <CareScreen
                       onBack={() => navTab('home')}
@@ -3272,6 +3724,7 @@ return (
                       personalContacts={personalContacts}
                     />
                   )}
+
                 </div>
 
                 {/* Fixed bottom navigation */}
@@ -3290,11 +3743,17 @@ return (
                     style={{ background: '#1E3B4022' }}
                   />
                 </div>
+
               </>
+
             )}
-          </>
+
+          </div>
+
         )}
+
       </div>
+
     </div>
   )
 }
