@@ -1,21 +1,31 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-
+import { GamePortal as CoconutMalletGame } from './games/coconut-mallet/src/games/coconut-mallet/index.ts'
+import { FolkMusicPortal } from './games/folk-music-portal/FolkMusicPortal'
+import { GoatPuzzlePortal } from './games/goat-sanctuary/src/games/goat-bamboo-sanctuary/GoatPuzzlePortal'
+import { JigsawPortal } from './games/jigsaw puzzle/src/games/simple-jigsaw/JigsawPortal'
+import { SortMatchPortal } from './games/sort-match-working-project/src/games/sort-match/SortMatchPortal'
+import { PairsPortal } from './games/pairs-working-project/src/games/pairs-concentration/PairsPortal'
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type AppFlow = 'onboarding' | 'portal'
 
-type OnboardStep = 'welcome' | 'language' | 'details' | 'pin' | 'done'
+type OnboardStep = 'welcome' | 'details' | 'pin' | 'done'
 
 type Screen =
   | 'home'
   | 'games'
   | 'game-tree'
   | 'game-match'
+  | 'game-coconut-mallet'
   | 'family'
   | 'family-analytics'
   | 'family-photos'
   | 'care'
-
+  | 'game-folk-music'
+  | 'game-goat-sanctuary' 
+  | 'game-jigsaw'
+  | 'game-sort-match'
+  | 'game-pairs'
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const ONBOARD_LANGUAGES = [
@@ -66,7 +76,7 @@ const TRANSLATIONS = {
     invalidPin: 'PIN must be exactly 4 digits.',
 
     setupComplete: 'Setup complete!',
-    readyToUse: "You're ready to start using MemorySathi.",
+    readyToUse: "You're ready to start using MemorySaathi.",
     goToDashboard: 'Go to Dashboard',
 
     goodMorning: 'Good Morning',
@@ -87,7 +97,7 @@ const TRANSLATIONS = {
 
     carePortal: 'Dementia Care',
     careSub: 'AI assistant & care guides',
-    askAssistant: '🎙 Ask Assistant',
+    askAssistant: '💬 Ask Assistant',
 
     familyTreeBuilder: 'Family Tree Builder',
     matchFaceName: 'Match Face to Name',
@@ -132,7 +142,7 @@ const TRANSLATIONS = {
     invalidPin: 'PIN ठीक 4 अंकों का होना चाहिए।',
 
     setupComplete: 'सेटअप पूरा हुआ!',
-    readyToUse: 'अब आप MemorySathi इस्तेमाल करने के लिए तैयार हैं।',
+    readyToUse: 'अब आप MemorySaathi इस्तेमाल करने के लिए तैयार हैं।',
     goToDashboard: 'डैशबोर्ड पर जाएं',
 
     goodMorning: 'सुप्रभात',
@@ -153,7 +163,7 @@ const TRANSLATIONS = {
 
     carePortal: 'डिमेंशिया देखभाल',
     careSub: 'AI सहायक और देखभाल मार्गदर्शिका',
-    askAssistant: '🎙 सहायक से पूछें',
+    askAssistant: '💬 सहायक से पूछें',
 
     familyTreeBuilder: 'फैमिली ट्री बिल्डर',
     matchFaceName: 'चेहरा और नाम मिलाएं',
@@ -199,7 +209,7 @@ const TRANSLATIONS = {
     invalidPin: "PIN ঠিক 4 সংখ্যাৰ হ'লাগিব।",
 
     setupComplete: 'ছেটআপ সম্পূৰ্ণ!',
-    readyToUse: 'এতিয়া আপুনি MemorySathi ব্যৱহাৰ কৰিবলৈ সাজু।',
+    readyToUse: 'এতিয়া আপুনি MemorySaathi ব্যৱহাৰ কৰিবলৈ সাজু।',
     goToDashboard: "ডেশ্ব'ৰ্ডলৈ যাওক",
 
     goodMorning: 'সুপ্ৰভাত',
@@ -220,7 +230,7 @@ const TRANSLATIONS = {
 
     carePortal: 'ডিমেনচিয়া যত্ন',
     careSub: 'AI সহায়ক আৰু যত্ন নিৰ্দেশনা',
-    askAssistant: '🎙 সহায়কক সুধক',
+    askAssistant: '💬 সহায়কক সুধক',
 
     familyTreeBuilder: 'ফেমিলি ট্ৰি বিল্ডাৰ',
     matchFaceName: 'মুখ আৰু নাম মিলাওক',
@@ -266,7 +276,7 @@ const TRANSLATIONS = {
     invalidPin: 'PIN অবশ্যই ঠিক 4 সংখ্যার হতে হবে।',
 
     setupComplete: 'সেটআপ সম্পূর্ণ!',
-    readyToUse: 'আপনি এখন MemorySathi ব্যবহার করতে প্রস্তুত।',
+    readyToUse: 'আপনি এখন MemorySaathi ব্যবহার করতে প্রস্তুত।',
     goToDashboard: 'ড্যাশবোর্ডে যান',
 
     goodMorning: 'সুপ্রভাত',
@@ -287,7 +297,7 @@ const TRANSLATIONS = {
 
     carePortal: 'ডিমেনশিয়া যত্ন',
     careSub: 'AI সহায়ক ও যত্নের নির্দেশিকা',
-    askAssistant: '🎙 সহায়ককে জিজ্ঞাসা করুন',
+    askAssistant: '💬 সহায়ককে জিজ্ঞাসা করুন',
 
     familyTreeBuilder: 'ফ্যামিলি ট্রি বিল্ডার',
     matchFaceName: 'মুখের সঙ্গে নাম মেলান',
@@ -333,7 +343,7 @@ const TRANSLATIONS = {
     invalidPin: 'PIN অসি মশিং 4 তমক ওইগদবনি।',
 
     setupComplete: 'শেমগৎপা লোইরে!',
-    readyToUse: 'নহাক্না MemorySathi শীজিন্নবা থৌরাং লোইরে।',
+    readyToUse: 'নহাক্না MemorySaathi শীজিন্নবা থৌরাং লোইরে।',
     goToDashboard: 'ডেশবোর্ডদা চৎলু',
 
     goodMorning: 'অয়ুক্কী খুরুমজরি',
@@ -354,7 +364,7 @@ const TRANSLATIONS = {
 
     carePortal: 'ডিমেনশিয়া য়েংশিনবা',
     careSub: 'AI মতেং পাংবা অমসুং য়েংশিনবগী লমজিং',
-    askAssistant: '🎙 মতেং পাংবদা হংলু',
+    askAssistant: '💬 মতেং পাংবদা হংলু',
 
     familyTreeBuilder: 'ফেমিলি ট্রি বিল্দর',
     matchFaceName: 'মায়গা মিংগা চান্নহল্লু',
@@ -400,7 +410,7 @@ const TRANSLATIONS = {
     invalidPin: 'PIN आ थार 4 अंकनि जानांगौ।',
 
     setupComplete: 'दिन्थिनाय जोबबाय!',
-    readyToUse: 'नोंथाङा दा MemorySathi बाहायनो थियार जाबाय।',
+    readyToUse: 'नोंथाङा दा MemorySaathi बाहायनो थियार जाबाय।',
     goToDashboard: 'डेशबोर्डआव थाङ',
 
     goodMorning: 'गोजोन फुं',
@@ -421,7 +431,7 @@ const TRANSLATIONS = {
 
     carePortal: 'डिमेन्सिया नाजाबनाय',
     careSub: 'AI हेफाजाब आरो नाजाबनाय गाइड',
-    askAssistant: '🎙 हेफाजाबग्राखौ सोंथि',
+    askAssistant: '💬 हेफाजाबग्राखौ सोंथि',
 
     familyTreeBuilder: 'नखर बिफां बानायग्रा',
     matchFaceName: 'मोखांजों मुं फोरमाय',
@@ -467,7 +477,7 @@ const TRANSLATIONS = {
     invalidPin: 'Ka PIN ka dei ban long 4 tylli tang.',
 
     setupComplete: 'La dep ka jingbuh!',
-    readyToUse: 'Phi la sngewbha ban pyndonkam ïa ka MemorySathi.',
+    readyToUse: 'Phi la sngewbha ban pyndonkam ïa ka MemorySaathi.',
     goToDashboard: 'Leit sha ka Dashboard',
 
     goodMorning: 'Khublei Sngi Step',
@@ -488,7 +498,7 @@ const TRANSLATIONS = {
 
     carePortal: 'Jingsumar Dementia',
     careSub: 'Nongiarap AI bad ki jingiakhun sumar',
-    askAssistant: '🎙 Kylli ïa u Nongiarap',
+    askAssistant: '💬 Kylli ïa u Nongiarap',
 
     familyTreeBuilder: 'Nongthaw Dieng Ïing Sem',
     matchFaceName: 'Pynlang Khmat bad Kyrteng',
@@ -534,7 +544,7 @@ const TRANSLATIONS = {
     invalidPin: 'PIN 4 an-ko ong·na nanga.',
 
     setupComplete: 'Dakani chuenga!',
-    readyToUse: 'Na·a MemorySathi-ko jean·na tarie ong·aha.',
+    readyToUse: 'Na·a MemorySaathi-ko jean·na tarie ong·aha.',
     goToDashboard: 'Dashboard-o Re·anga',
 
     goodMorning: 'Namgipa Prinang',
@@ -555,7 +565,7 @@ const TRANSLATIONS = {
 
     carePortal: 'Dementia Rakkiani',
     careSub: 'AI dakchakgipa aro rakkiani gaid',
-    askAssistant: '🎙 Dakchakgipako Singna',
+    askAssistant: '💬 Dakchakgipako Singna',
 
     familyTreeBuilder: 'Nokdang Bolgipok Dakgipa',
     matchFaceName: 'Mikkang aro Bimungko Rakna',
@@ -601,7 +611,7 @@ const TRANSLATIONS = {
     invalidPin: 'PIN chu digit 4 vek a ni tûr a ni.',
 
     setupComplete: 'Siamna a zo ta!',
-    readyToUse: 'MemorySathi hman tûrin i inpeih ta.',
+    readyToUse: 'MemorySaathi hman tûrin i inpeih ta.',
     goToDashboard: 'Dashboard-ah Kal Rawh',
 
     goodMorning: 'Zîngkar Ṭha',
@@ -622,7 +632,7 @@ const TRANSLATIONS = {
 
     carePortal: 'Dementia Enkawlna',
     careSub: 'AI ṭanpuitu leh enkawlna kaihhruaina',
-    askAssistant: '🎙 Ṭanpuitu Zâwt Rawh',
+    askAssistant: '💬 Ṭanpuitu Zâwt Rawh',
 
     familyTreeBuilder: 'Chhûngkaw Thlâi Siamtu',
     matchFaceName: 'Hmêl leh Hming Inrem Tîr',
@@ -652,7 +662,7 @@ const PORTAL_TRANSLATIONS = {
     cognitiveAnalytics: 'Cognitive Analytics',
     analyticsSub: 'Memory scores, attention, AI flags',
     gameManager: 'Custom Game Manager',
-    gameManagerSub: 'Upload photos, record audio names',
+    gameManagerSub: 'Upload family photos',
     familyContacts: 'Family Contacts',
 
     thisWeek: 'This Week',
@@ -674,11 +684,8 @@ const PORTAL_TRANSLATIONS = {
     weekDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
 
     photoUpload: 'Photo Upload',
-    photosAudioNames: 'Family Photos & Audio Names',
+    photosSection: 'Family Photos',
     uploadPhoto: 'Upload Photo',
-    recordingLabel: 'Recording…',
-    recordedLabel: 'Recorded',
-    recordName: 'Record Name',
     addFamilyMember: 'Add New Family Member',
     dailyGameReminder: 'Daily Game Reminder',
     saveReminder: 'Save Reminder',
@@ -705,7 +712,7 @@ const PORTAL_TRANSLATIONS = {
     cognitiveAnalytics: 'संज्ञानात्मक विश्लेषण',
     analyticsSub: 'स्मृति स्कोर, ध्यान, AI संकेत',
     gameManager: 'कस्टम गेम मैनेजर',
-    gameManagerSub: 'फ़ोटो अपलोड करें, नाम रिकॉर्ड करें',
+    gameManagerSub: 'परिवार की फ़ोटो अपलोड करें',
     familyContacts: 'परिवार के संपर्क',
 
     thisWeek: 'इस सप्ताह',
@@ -727,11 +734,8 @@ const PORTAL_TRANSLATIONS = {
     weekDays: ['सोम', 'मंगल', 'बुध', 'गुरु', 'शुक्र', 'शनि', 'रवि'],
 
     photoUpload: 'फ़ोटो अपलोड',
-    photosAudioNames: 'परिवार की फ़ोटो और नाम की आवाज़',
+    photosSection: 'परिवार की फ़ोटो',
     uploadPhoto: 'फ़ोटो अपलोड करें',
-    recordingLabel: 'रिकॉर्ड हो रहा है…',
-    recordedLabel: 'रिकॉर्ड हुआ',
-    recordName: 'नाम रिकॉर्ड करें',
     addFamilyMember: 'नया सदस्य जोड़ें',
     dailyGameReminder: 'दैनिक खेल अनुस्मारक',
     saveReminder: 'अनुस्मारक सहेजें',
@@ -758,7 +762,7 @@ const PORTAL_TRANSLATIONS = {
     cognitiveAnalytics: 'জ্ঞানাত্মক বিশ্লেষণ',
     analyticsSub: 'স্মৃতিৰ নম্বৰ, মনোযোগ, AI সংকেত',
     gameManager: 'কাষ্টম গেম মেনেজাৰ',
-    gameManagerSub: 'ফটো আপল’ড কৰক, নাম ৰেকৰ্ড কৰক',
+    gameManagerSub: 'পৰিয়ালৰ ফটো আপল’ড কৰক',
     familyContacts: 'পৰিয়ালৰ যোগাযোগ',
 
     thisWeek: 'এই সপ্তাহ',
@@ -780,11 +784,8 @@ const PORTAL_TRANSLATIONS = {
     weekDays: ['সোম', 'মঙ্গল', 'বুধ', 'বৃহ', 'শুক্ৰ', 'শনি', 'দেও'],
 
     photoUpload: 'ফটো আপল’ড',
-    photosAudioNames: 'পৰিয়ালৰ ফটো আৰু নামৰ মাত',
+    photosSection: 'পৰিয়ালৰ ফটো',
     uploadPhoto: 'ফটো আপল’ড কৰক',
-    recordingLabel: 'ৰেকৰ্ড হৈ আছে…',
-    recordedLabel: 'ৰেকৰ্ড হ’ল',
-    recordName: 'নাম ৰেকৰ্ড কৰক',
     addFamilyMember: 'নতুন সদস্য যোগ কৰক',
     dailyGameReminder: 'দৈনিক খেলৰ মনত পেলোৱা',
     saveReminder: 'ছেভ কৰক',
@@ -811,7 +812,7 @@ const PORTAL_TRANSLATIONS = {
     cognitiveAnalytics: 'জ্ঞানীয় বিশ্লেষণ',
     analyticsSub: 'স্মৃতির স্কোর, মনোযোগ, AI সংকেত',
     gameManager: 'কাস্টম গেম ম্যানেজার',
-    gameManagerSub: 'ছবি আপলোড করুন, নাম রেকর্ড করুন',
+    gameManagerSub: 'পরিবারের ছবি আপলোড করুন',
     familyContacts: 'পরিবারের যোগাযোগ',
 
     thisWeek: 'এই সপ্তাহ',
@@ -833,11 +834,8 @@ const PORTAL_TRANSLATIONS = {
     weekDays: ['সোম', 'মঙ্গল', 'বুধ', 'বৃহ', 'শুক্র', 'শনি', 'রবি'],
 
     photoUpload: 'ছবি আপলোড',
-    photosAudioNames: 'পরিবারের ছবি ও নামের অডিও',
+    photosSection: 'পরিবারের ছবি',
     uploadPhoto: 'ছবি আপলোড করুন',
-    recordingLabel: 'রেকর্ড হচ্ছে…',
-    recordedLabel: 'রেকর্ড হয়েছে',
-    recordName: 'নাম রেকর্ড করুন',
     addFamilyMember: 'নতুন সদস্য যোগ করুন',
     dailyGameReminder: 'দৈনিক খেলার রিমাইন্ডার',
     saveReminder: 'রিমাইন্ডার সংরক্ষণ করুন',
@@ -864,7 +862,7 @@ const PORTAL_TRANSLATIONS = {
     cognitiveAnalytics: 'খংবগী অনালাইসিস',
     analyticsSub: 'নিংশিংবগী মার্ক, পুক্নিং থমজিনবা, AI খুদম',
     gameManager: 'কষ্টম গেম মেনেজর',
-    gameManagerSub: 'ফোটো থাদোক্লু, মিং রেকর্ড তৌরো',
+    gameManagerSub: 'ইমুংগী ফোটো থাদোক্লু',
     familyContacts: 'ইমুং মনুংগী কন্টেক্ট',
 
     thisWeek: 'চয়োল অসি',
@@ -886,11 +884,8 @@ const PORTAL_TRANSLATIONS = {
     weekDays: ['নিংথৌকাপা', 'লৈবাকপোকপা', 'য়ুমশকৈশা', 'শগোলশেন', 'ইরাই', 'থাংজা', 'নোংমাইজিং'],
 
     photoUpload: 'ফোটো থাদোকপা',
-    photosAudioNames: 'ইমুংগী ফোটো অমসুং মিংগী খোঞ্জেল',
+    photosSection: 'ইমুংগী ফোটো',
     uploadPhoto: 'ফোটো থাদোক্লু',
-    recordingLabel: 'রেকর্ড তৌরি…',
-    recordedLabel: 'রেকর্ড তৌরে',
-    recordName: 'মিং রেকর্ড তৌরো',
     addFamilyMember: 'অনৌবা মেম্বর হাপচিল্লু',
     dailyGameReminder: 'নুমিৎ খুদিংগী গেম নিংশিংহনবা',
     saveReminder: 'নিংশিংহনবা থম্মু',
@@ -917,7 +912,7 @@ const PORTAL_TRANSLATIONS = {
     cognitiveAnalytics: 'गोसो सानथावनि बिजिरनाय',
     analyticsSub: 'गोसोनि नामबार, गोसो होनाय, AI सिन',
     gameManager: 'कास्टम गेम मेनेजार',
-    gameManagerSub: 'फोटो आपलड खालाम, मुं रेकर्ड खालाम',
+    gameManagerSub: 'नखरनि फोटो आपलड खालाम',
     familyContacts: 'नखरनि सोमोन्दो',
 
     thisWeek: 'बे सप्ताह',
@@ -939,11 +934,8 @@ const PORTAL_TRANSLATIONS = {
     weekDays: ['सोम', 'मंगल', 'बुध', 'बिस्थि', 'सुक्र', 'सनि', 'रबि'],
 
     photoUpload: 'फोटो आपलड',
-    photosAudioNames: 'नखरनि फोटो आरो मुंनि गोदै',
+    photosSection: 'नखरनि फोटो',
     uploadPhoto: 'फोटो आपलड खालाम',
-    recordingLabel: 'रेकर्ड जायो दं…',
-    recordedLabel: 'रेकर्ड जाबाय',
-    recordName: 'मुं रेकर्ड खालाम',
     addFamilyMember: 'गोदान सोद्रोमा दाजाब हो',
     dailyGameReminder: 'सानफ्रोमबो खेलानाय गोसो खांहोग्रा',
     saveReminder: 'गोसो खांहोग्राखौ दोन',
@@ -970,7 +962,7 @@ const PORTAL_TRANSLATIONS = {
     cognitiveAnalytics: 'Jingsawa Jingmut',
     analyticsSub: 'Ki mark jingkynmaw, jingpeit, ki jingpyntip AI',
     gameManager: 'Nongsynshar Kai',
-    gameManagerSub: 'Buh ki dur, thaw ki kyrteng sur',
+    gameManagerSub: 'Buh ki dur ïing sem',
     familyContacts: 'Ki Jingiasnoh Ïing Sem',
 
     thisWeek: 'Ka Taiew Kane',
@@ -992,11 +984,8 @@ const PORTAL_TRANSLATIONS = {
     weekDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
 
     photoUpload: 'Jingbuh Dur',
-    photosAudioNames: 'Ki Dur Ïing Sem bad Ki Kyrteng Sur',
+    photosSection: 'Ki Dur Ïing Sem',
     uploadPhoto: 'Buh Dur',
-    recordingLabel: 'Dang thaw…',
-    recordedLabel: 'La thaw',
-    recordName: 'Thaw Kyrteng',
     addFamilyMember: 'Buh Nong Ïing Sem Bathymmai',
     dailyGameReminder: 'Jingpynkynmaw Kai man ka sngi',
     saveReminder: 'Buh ïa ka Jingpynkynmaw',
@@ -1023,7 +1012,7 @@ const PORTAL_TRANSLATIONS = {
     cognitiveAnalytics: 'Sikkeni Bidingo Bisen',
     analyticsSub: 'Ka·sani mark, gisik ronani, AI-ni sin',
     gameManager: 'Kastam Kamrang Rakgipa',
-    gameManagerSub: 'Chitrako donna, bimungko rekord dakna',
+    gameManagerSub: 'Nokdangni chitrarangko donna',
     familyContacts: 'Nokdangni Sokbaani',
 
     thisWeek: 'Ia Wa·alo',
@@ -1045,11 +1034,8 @@ const PORTAL_TRANSLATIONS = {
     weekDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
 
     photoUpload: 'Chitra Donani',
-    photosAudioNames: 'Nokdangni Chitrarang aro Bimungni Ku·rang',
+    photosSection: 'Nokdangni Chitrarang',
     uploadPhoto: 'Chitrako Donna',
-    recordingLabel: 'Rekord daka…',
-    recordedLabel: 'Rekord dakaha',
-    recordName: 'Bimungko Rekord Dakna',
     addFamilyMember: 'Gital Nokdang Sa-ko Dakchakna',
     dailyGameReminder: 'Salsa Kamani Ka·sarik',
     saveReminder: 'Ka·sarikko Donna',
@@ -1076,7 +1062,7 @@ const PORTAL_TRANSLATIONS = {
     cognitiveAnalytics: 'Rilru Hriatthiamna Enfiahna',
     analyticsSub: 'Hriatrengna mark, ngaihvenna, AI kawhhmuhna',
     gameManager: 'Infiamna Enkawltu',
-    gameManagerSub: 'Milem dah, hming aw record',
+    gameManagerSub: 'Chhûngkaw milem dah luh',
     familyContacts: 'Chhûngkaw Inbiakpawhna',
 
     thisWeek: 'He Kar Hi',
@@ -1098,11 +1084,8 @@ const PORTAL_TRANSLATIONS = {
     weekDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
 
     photoUpload: 'Milem Dahluhna',
-    photosAudioNames: 'Chhûngkaw Milem leh Hming Aw',
+    photosSection: 'Chhûngkaw Milem',
     uploadPhoto: 'Milem Dah Luh',
-    recordingLabel: 'Record mêk…',
-    recordedLabel: 'Record tawh',
-    recordName: 'Hming Record Rawh',
     addFamilyMember: 'Chhûngte Thar Belh Rawh',
     dailyGameReminder: 'Nî Tin Infiamna Hriattîrna',
     saveReminder: 'Hriattîrna Dah Rawh',
@@ -1173,17 +1156,6 @@ const REMINDERS = [
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
-function MicIcon({ size = 28 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <rect x="9" y="2" width="6" height="12" rx="3" fill="currentColor" />
-      <path d="M5 10a7 7 0 0 0 14 0" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-      <line x1="12" y1="17" x2="12" y2="21" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-      <line x1="8" y1="21" x2="16" y2="21" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-    </svg>
-  )
-}
-
 function BackIcon() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -1200,33 +1172,89 @@ function ChevronRight() {
   )
 }
 
-// ─── Voice Button ─────────────────────────────────────────────────────────────
-
-function VoiceButton({ active, onToggle, size = 64 }: { active: boolean; onToggle: () => void; size?: number }) {
+function ChevronDown({ size = 18 }: { size?: number }) {
   return (
-    <button
-      onClick={onToggle}
-      className="relative flex shrink-0 items-center justify-center rounded-full shadow-lg transition-all duration-300"
-      style={{
-        width: size, height: size,
-        background: active ? '#355FC7' : '#1D2B49',
-        transform: active ? 'scale(1.08)' : 'scale(1)',
-      }}
-      aria-label="Voice Assistant"
-    >
-      {active && <span className="mic-pulse" />}
-      <span className="text-white"><MicIcon size={size * 0.38} /></span>
-    </button>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  )
+}
+
+// ─── Language Dropdown (welcome screen) ───────────────────────────────────────
+
+function LanguageDropdown({ value, onChange }: { value: LangCode; onChange: (l: LangCode) => void }) {
+  const [open, setOpen] = useState(false)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const current = ONBOARD_LANGUAGES.find(l => l.code === value) ?? ONBOARD_LANGUAGES[0]
+
+  useEffect(() => {
+    function handleOutside(e: MouseEvent) {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleOutside)
+    return () => document.removeEventListener('mousedown', handleOutside)
+  }, [])
+
+  return (
+    <div ref={rootRef} className="relative w-full">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className="flex w-full items-center justify-between rounded-2xl px-4 py-3.5 transition-all active:scale-[0.98]"
+        style={{ background: 'rgba(53,95,199,0.07)', border: '1.5px solid rgba(53,95,199,0.2)' }}
+      >
+        <span className="flex items-center gap-2.5">
+          <span className="text-xl leading-none">{LANGUAGE_ICONS[current.code]}</span>
+          <span className="text-sm font-extrabold" style={{ color: '#1D2B49' }}>{current.label}</span>
+          <span className="text-xs font-semibold" style={{ color: '#8499BC', fontFamily: 'DM Sans, sans-serif' }}>{current.sub}</span>
+        </span>
+        <span
+          className="shrink-0 transition-transform duration-200"
+          style={{ color: '#355FC7', transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+        >
+          <ChevronDown />
+        </span>
+      </button>
+
+      {open && (
+        <div
+          className="scrollbar-hide absolute bottom-full left-0 right-0 z-20 mb-2 max-h-60 overflow-y-auto rounded-2xl p-1.5 shadow-xl"
+          style={{ background: '#FBF8F0', border: '1.5px solid #E8D5B8' }}
+          role="listbox"
+        >
+          {ONBOARD_LANGUAGES.map(l => {
+            const active = l.code === value
+            return (
+              <button
+                key={l.code}
+                type="button"
+                role="option"
+                aria-selected={active}
+                onClick={() => { onChange(l.code); setOpen(false) }}
+                className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-all active:scale-[0.98]"
+                style={{ background: active ? '#EEF2FF' : 'transparent' }}
+              >
+                <span className="text-lg leading-none">{LANGUAGE_ICONS[l.code]}</span>
+                <span className="flex-1 text-sm font-bold" style={{ color: active ? '#355FC7' : '#1D2B49' }}>{l.label}</span>
+                <span className="text-xs font-semibold" style={{ color: '#8499BC', fontFamily: 'DM Sans, sans-serif' }}>{l.sub}</span>
+                {active && <span style={{ color: '#355FC7' }}>✓</span>}
+              </button>
+            )
+          })}
+        </div>
+      )}
+    </div>
   )
 }
 
 // ─── Screen Header ────────────────────────────────────────────────────────────
 
 function ScreenHeader({
-  title, subtitle, bg, onBack, micActive, onMicToggle, showMic = true,
+  title, subtitle, bg, onBack,
 }: {
-  title: string; subtitle?: string; bg: string;
-  onBack?: () => void; micActive: boolean; onMicToggle: () => void; showMic?: boolean;
+  title: string; subtitle?: string; bg: string; onBack?: () => void;
 }) {
   return (
     <div className="shrink-0 px-5 pb-5 pt-10" style={{ background: bg }}>
@@ -1242,7 +1270,6 @@ function ScreenHeader({
             <h1 className="text-2xl font-extrabold leading-tight" style={{ color: '#FBF8F0' }}>{title}</h1>
           </div>
         </div>
-        {showMic && <VoiceButton active={micActive} onToggle={onMicToggle} />}
       </div>
     </div>
   )
@@ -1477,7 +1504,7 @@ function HomeScreen({ onNavigate, patientName, language }: {
   onNavigate: (s: Screen) => void; patientName: string; language: LangCode;
 }) {
   const hour = new Date().getHours()
-  
+
   const t =
     TRANSLATIONS[language as keyof typeof TRANSLATIONS] ??
     TRANSLATIONS.en;
@@ -1558,12 +1585,12 @@ function HomeScreen({ onNavigate, patientName, language }: {
 
 // ─── GAMES SELECTION ──────────────────────────────────────────────────────────
 
-function GamesScreen({ onNavigate, onBack, micActive, onMicToggle }: {
-  onNavigate: (s: Screen) => void; onBack: () => void; micActive: boolean; onMicToggle: () => void;
+function GamesScreen({ onNavigate, onBack }: {
+  onNavigate: (s: Screen) => void; onBack: () => void;
 }) {
   return (
     <div className="flex h-full flex-col" style={{ background: '#FBF8F0' }}>
-      <ScreenHeader title="Games Portal" subtitle="Let's Play" bg="#355FC7" onBack={onBack} micActive={micActive} onMicToggle={onMicToggle} />
+      <ScreenHeader title="Games Portal" subtitle="Let's Play" bg="#355FC7" onBack={onBack} />
 
       <div className="mx-5 mt-4 flex items-center gap-3 rounded-xl p-3" style={{ background: '#1D2B49' }}>
         <span className="text-xl">⭐</span>
@@ -1578,6 +1605,146 @@ function GamesScreen({ onNavigate, onBack, micActive, onMicToggle }: {
 
         {/* Featured games */}
         <div className="flex flex-col gap-4">
+         {/* Memory Pairs */}
+          <button
+            onClick={() => onNavigate('game-pairs')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{ background: '#7C3AED' }}
+          >
+            <div className="p-5">
+              <div className="mb-3 text-4xl">🧠</div>
+
+              <h2 className="text-xl font-extrabold text-white">
+                Memory Pairs
+              </h2>
+
+              <p
+                className="mt-1 text-sm font-medium"
+                style={{
+                  color: '#EDE9FE',
+                  fontFamily: 'DM Sans, sans-serif',
+                }}
+              >
+                Find matching pairs and exercise your memory.
+              </p>
+
+              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
+                ▶ Start Game
+              </div>
+            </div>
+          </button>
+          {/* Sort & Match */}
+          <button
+            onClick={() => onNavigate('game-sort-match')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{ background: '#D97706' }}
+          >
+            <div className="p-5">
+              <div className="mb-3 text-4xl">🧺</div>
+
+              <h2 className="text-xl font-extrabold text-white">
+                Sort & Match
+              </h2>
+
+              <p
+                className="mt-1 text-sm font-medium"
+                style={{
+                  color: '#FFF1D6',
+                  fontFamily: 'DM Sans, sans-serif',
+                }}
+              >
+                Sort everyday objects into the right categories.
+              </p>
+
+              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
+                ▶ Start Game
+              </div>
+            </div>
+          </button> 
+{/* Jigsaw Puzzle */}
+          <button
+            onClick={() => onNavigate('game-jigsaw')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{ background: '#7B5EA7' }}
+          >
+            <div className="p-5">
+              <div className="mb-3 text-4xl">🧩</div>
+
+              <h2 className="text-xl font-extrabold text-white">
+                Jigsaw Puzzle
+              </h2>
+
+              <p
+                className="mt-1 text-sm font-medium"
+                style={{
+                  color: '#EEE5F8',
+                  fontFamily: 'DM Sans, sans-serif',
+                }}
+              >
+                Piece together the picture and exercise your memory.
+              </p>
+
+              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
+                ▶ Start Game
+              </div>
+            </div>
+          </button>
+          {/* Goat & Bamboo Sanctuary */}
+          <button
+            onClick={() => onNavigate('game-goat-sanctuary')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{ background: '#4A7C59' }}
+          >
+            <div className="p-5">
+              <div className="mb-3 text-4xl">🐐</div>
+
+              <h2 className="text-xl font-extrabold text-white">
+                Goat & Bamboo Sanctuary
+              </h2>
+
+              <p
+                className="mt-1 text-sm font-medium"
+                style={{
+                  color: '#E1F0E4',
+                  fontFamily: 'DM Sans, sans-serif',
+                }}
+              >
+                Solve the puzzle and guide the goat through the bamboo sanctuary.
+              </p>
+
+              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
+                ▶ Start Game
+              </div>
+            </div>
+          </button>
+          {/* North-East Folk Music */}
+          <button
+            onClick={() => onNavigate('game-folk-music')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{ background: '#355FC7' }}
+          >
+            <div className="p-5">
+              <div className="mb-3 text-4xl">🎵</div>
+
+              <h2 className="text-xl font-extrabold text-white">
+                North-East Folk Music
+              </h2>
+
+              <p
+                className="mt-1 text-sm font-medium"
+                style={{
+                  color: '#DCE6FF',
+                  fontFamily: 'DM Sans, sans-serif',
+                }}
+              >
+                Listen to traditional music and match it with its story.
+              </p>
+
+              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
+                ▶ Start Game
+              </div>
+            </div>
+          </button>          
           {/* Family Tree */}
           <button
             onClick={() => onNavigate('game-tree')}
@@ -1603,7 +1770,34 @@ function GamesScreen({ onNavigate, onBack, micActive, onMicToggle }: {
               <div className="mt-4 rounded-xl py-3 text-center text-base font-extrabold" style={{ background: '#F1E3A4', color: '#1D2B49' }}>▶  Start Game</div>
             </div>
           </button>
+{/* Coconut Mallet */}
+          <button
+            onClick={() => onNavigate('game-coconut-mallet')}
+            className="w-full overflow-hidden rounded-3xl text-left shadow-sm transition-all duration-150 active:scale-95"
+            style={{ background: '#355FC7' }}
+          >
+            <div className="p-5">
+              <div className="mb-3 text-4xl">🥥</div>
 
+              <h2 className="text-xl font-extrabold text-white">
+                Coconut Mallet
+              </h2>
+
+              <p
+                className="mt-1 text-sm font-medium"
+                style={{
+                  color: '#D8E3FF',
+                  fontFamily: 'DM Sans, sans-serif',
+                }}
+              >
+                Tap and drag to play this fun coordination game.
+              </p>
+
+              <div className="mt-4 inline-flex rounded-xl bg-white/15 px-4 py-2 text-sm font-bold text-white">
+                ▶ Start Game
+              </div>
+            </div>
+</button>
           {/* Match Face */}
           <button
             onClick={() => onNavigate('game-match')}
@@ -1643,9 +1837,7 @@ function GamesScreen({ onNavigate, onBack, micActive, onMicToggle }: {
 
 // ─── GAME 1: FAMILY TREE BUILDER ─────────────────────────────────────────────
 
-function FamilyTreeGame({ onBack, micActive, onMicToggle }: {
-  onBack: () => void; micActive: boolean; onMicToggle: () => void;
-}) {
+function FamilyTreeGame({ onBack }: { onBack: () => void }) {
   const [placed, setPlaced] = useState<Record<number, number>>({}) // slotId → memberId
   const [selected, setSelected] = useState<number | null>(null)
   const [celebrate, setCelebrate] = useState(false)
@@ -1675,7 +1867,7 @@ function FamilyTreeGame({ onBack, micActive, onMicToggle }: {
 
   return (
     <div className="flex h-full flex-col" style={{ background: '#FBF8F0' }}>
-      <ScreenHeader title="Family Tree Builder" subtitle="Game 1" bg="#355FC7" onBack={onBack} micActive={micActive} onMicToggle={onMicToggle} />
+      <ScreenHeader title="Family Tree Builder" subtitle="Game 1" bg="#355FC7" onBack={onBack} />
 
       {/* Instruction */}
       <div className="mx-5 mt-3 flex items-center gap-3 rounded-xl px-4 py-3" style={{ background: '#F1E3A4', border: '1.5px solid #D4C47A' }}>
@@ -1779,9 +1971,7 @@ function FamilyTreeGame({ onBack, micActive, onMicToggle }: {
 
 // ─── GAME 2: MATCH FACE TO NAME ───────────────────────────────────────────────
 
-function MatchFaceGame({ onBack, micActive, onMicToggle }: {
-  onBack: () => void; micActive: boolean; onMicToggle: () => void;
-}) {
+function MatchFaceGame({ onBack }: { onBack: () => void }) {
   const [cardIdx, setCardIdx] = useState(0)
   const [answered, setAnswered] = useState<string | null>(null)
   const [score, setScore] = useState(0)
@@ -1806,7 +1996,7 @@ function MatchFaceGame({ onBack, micActive, onMicToggle }: {
 
   return (
     <div className="flex h-full flex-col" style={{ background: '#FBF8F0' }}>
-      <ScreenHeader title="Match Face to Name" subtitle="Game 2" bg="#4A7C59" onBack={onBack} micActive={micActive} onMicToggle={onMicToggle} />
+      <ScreenHeader title="Match Face to Name" subtitle="Game 2" bg="#4A7C59" onBack={onBack} />
 
       {done ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
@@ -1900,7 +2090,7 @@ function FamilyPortalScreen({ onNavigate, onBack, language }: {
   const p = portalT(language)
   return (
     <div className="flex h-full flex-col" style={{ background: '#FBF8F0' }}>
-      <ScreenHeader title={t.familyPortal} subtitle={p.fpSubtitle} bg="#4A7C59" onBack={onBack} micActive={false} onMicToggle={() => {}} showMic={false} />
+      <ScreenHeader title={t.familyPortal} subtitle={p.fpSubtitle} bg="#4A7C59" onBack={onBack} />
 
       <div className="scrollbar-hide flex-1 overflow-y-auto px-5 pb-6 pt-5">
         {/* Auth badge */}
@@ -1966,8 +2156,8 @@ function FamilyPortalScreen({ onNavigate, onBack, language }: {
 
 // ─── ANALYTICS DASHBOARD ──────────────────────────────────────────────────────
 
-function AnalyticsDashboard({ onBack, micActive, onMicToggle, language }: {
-  onBack: () => void; micActive: boolean; onMicToggle: () => void; language: LangCode;
+function AnalyticsDashboard({ onBack, language }: {
+  onBack: () => void; language: LangCode;
 }) {
   const maxScore = Math.max(...WEEKLY_SCORES)
   const t = TRANSLATIONS[language] ?? TRANSLATIONS.en
@@ -1975,7 +2165,7 @@ function AnalyticsDashboard({ onBack, micActive, onMicToggle, language }: {
 
   return (
     <div className="flex h-full flex-col" style={{ background: '#FBF8F0' }}>
-      <ScreenHeader title={p.cognitiveAnalytics} subtitle={p.thisWeek} bg="#1D2B49" onBack={onBack} micActive={micActive} onMicToggle={onMicToggle} />
+      <ScreenHeader title={p.cognitiveAnalytics} subtitle={p.thisWeek} bg="#1D2B49" onBack={onBack} />
 
       <div className="scrollbar-hide flex-1 overflow-y-auto px-5 pb-6 pt-5">
         {/* KPI cards */}
@@ -2060,33 +2250,21 @@ function AnalyticsDashboard({ onBack, micActive, onMicToggle, language }: {
 
 // ─── PHOTO MANAGER ────────────────────────────────────────────────────────────
 
-function PhotoManager({ onBack, micActive, onMicToggle, language, onLanguageChange }: {
-  onBack: () => void; micActive: boolean; onMicToggle: () => void;
+function PhotoManager({ onBack, language, onLanguageChange }: {
+  onBack: () => void;
   language: LangCode; onLanguageChange: (l: LangCode) => void;
 }) {
-  const [recording, setRecording] = useState<number | null>(null)
-  const [recorded, setRecorded] = useState<number[]>([])
   const [reminder, setReminder] = useState('10:00 AM')
   const p = portalT(language)
 
-  function toggleRecord(id: number) {
-    if (recording === id) {
-      setRecording(null)
-      setRecorded(prev => [...prev, id])
-    } else {
-      setRecording(id)
-      setTimeout(() => { setRecording(null); setRecorded(prev => [...prev, id]) }, 2000)
-    }
-  }
-
   return (
     <div className="flex h-full flex-col" style={{ background: '#FBF8F0' }}>
-      <ScreenHeader title={p.gameManager} subtitle={p.photoUpload} bg="#C4622D" onBack={onBack} micActive={micActive} onMicToggle={onMicToggle} />
+      <ScreenHeader title={p.gameManager} subtitle={p.photoUpload} bg="#C4622D" onBack={onBack} />
 
       <div className="scrollbar-hide flex-1 overflow-y-auto px-5 pb-6 pt-5">
         {/* Upload section */}
         <div className="mb-4 rounded-2xl p-4" style={{ background: '#FFF', border: '1.5px solid #E8D5B8' }}>
-          <p className="mb-3 text-xs font-bold uppercase tracking-widest" style={{ color: '#8499BC', fontFamily: 'DM Sans, sans-serif' }}>{p.photosAudioNames}</p>
+          <p className="mb-3 text-xs font-bold uppercase tracking-widest" style={{ color: '#8499BC', fontFamily: 'DM Sans, sans-serif' }}>{p.photosSection}</p>
           <div className="grid grid-cols-2 gap-3">
             {FAMILY_MEMBERS.map(m => (
               <div key={m.id} className="flex flex-col items-center gap-2 rounded-2xl p-3" style={{ background: '#F8F4EE', border: '1.5px solid #E8D5B8' }}>
@@ -2100,18 +2278,6 @@ function PhotoManager({ onBack, micActive, onMicToggle, language, onLanguageChan
                 {/* Upload button */}
                 <button className="w-full rounded-xl py-2 text-xs font-bold" style={{ background: '#EFE0C8', color: '#1D2B49' }}>
                   📷 {p.uploadPhoto}
-                </button>
-
-                {/* Record audio */}
-                <button
-                  onClick={() => toggleRecord(m.id)}
-                  className="w-full rounded-xl py-2 text-xs font-bold transition-all"
-                  style={{
-                    background: recording === m.id ? '#C4622D' : recorded.includes(m.id) ? '#4A7C59' : '#1D2B49',
-                    color: '#FBF8F0',
-                  }}
-                >
-                  {recording === m.id ? `⏺ ${p.recordingLabel}` : recorded.includes(m.id) ? `✓ ${p.recordedLabel}` : `🎙 ${p.recordName}`}
                 </button>
               </div>
             ))}
@@ -2164,10 +2330,7 @@ function PhotoManager({ onBack, micActive, onMicToggle, language, onLanguageChan
 
 // ─── CARE / AI ASSISTANT ──────────────────────────────────────────────────────
 
-function CareScreen({ onBack, micActive, onMicToggle }: {
-  onBack: () => void; micActive: boolean; onMicToggle: () => void;
-}) {
-  const [voiceActive, setVoiceActive] = useState(false)
+function CareScreen({ onBack }: { onBack: () => void }) {
   const [messages, setMessages] = useState([
     { from: 'ai', text: 'Namaste, Asha Devi! I am your care assistant. How are you feeling today?' },
     { from: 'user', text: 'I feel a little confused about my morning medicines.' },
@@ -2186,7 +2349,7 @@ function CareScreen({ onBack, micActive, onMicToggle }: {
     setMessages(prev => [
       ...prev,
       { from: 'user', text: input },
-      { from: 'ai', text: "Thank you for sharing that. I am here to help you. Please speak slowly or type your question and I will assist you." },
+      { from: 'ai', text: "Thank you for sharing that. I am here to help you. Please type your question and I will assist you." },
     ])
     setInput('')
   }
@@ -2195,30 +2358,15 @@ function CareScreen({ onBack, micActive, onMicToggle }: {
 
   return (
     <div className="flex h-full flex-col" style={{ background: '#FBF8F0' }}>
-      <ScreenHeader title="Dementia Care" subtitle="AI Companion" bg="#C4622D" onBack={onBack} micActive={micActive} onMicToggle={onMicToggle} />
+      <ScreenHeader title="Dementia Care" subtitle="AI Companion" bg="#C4622D" onBack={onBack} />
 
-      {/* Voice orb */}
+      {/* Assistant banner */}
       <div className="mx-5 mt-3 flex items-center gap-4 rounded-2xl p-4" style={{ background: '#1D2B49' }}>
-        <button
-          onClick={() => setVoiceActive(v => !v)}
-          className="relative flex shrink-0 items-center justify-center rounded-full transition-all duration-300"
-          style={{ width: 64, height: 64, background: voiceActive ? '#C4622D' : '#355FC7' }}
-        >
-          {voiceActive && <span className="mic-pulse" />}
-          <MicIcon size={26} />
-        </button>
+        <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-3xl" style={{ background: 'rgba(255,255,255,0.12)' }}>🤖</div>
         <div className="flex-1">
-          {voiceActive ? (
-            <div className="flex h-8 items-center gap-1">
-              {[4, 7, 5, 9, 6, 8, 4, 6, 7, 5].map((h, i) => (
-                <div key={i} className="flex-1 animate-pulse rounded-full" style={{ height: `${h * 4}px`, background: '#F1E3A4', animationDelay: `${i * 0.07}s` }} />
-              ))}
-            </div>
-          ) : (
-            <p className="text-base font-bold" style={{ color: '#FBF8F0' }}>Tap to speak to assistant</p>
-          )}
-          <p className="mt-1 text-xs font-semibold" style={{ color: voiceActive ? '#F1E3A4' : '#8499BC', fontFamily: 'DM Sans, sans-serif' }}>
-            {voiceActive ? 'Listening… speak now' : 'Available 24 hours · Local language supported'}
+          <p className="text-base font-bold" style={{ color: '#FBF8F0' }}>Type your question to the assistant</p>
+          <p className="mt-1 text-xs font-semibold" style={{ color: '#8499BC', fontFamily: 'DM Sans, sans-serif' }}>
+            Available 24 hours · Local language supported
           </p>
         </div>
       </div>
@@ -2398,11 +2546,9 @@ export default function App() {
 
   // Portal state
   const [screen, setScreen] = useState<Screen>('home')
-  const [micActive, setMicActive] = useState(false)
   const [history, setHistory] = useState<Screen[]>([])
 
   function navigate(s: Screen) {
-    // Check if trying to access Family Portal
     if (s === 'family') {
       setShowPinScreen(true)
       return
@@ -2410,7 +2556,6 @@ export default function App() {
 
     setHistory(prev => [...prev, screen])
     setScreen(s)
-    setMicActive(false)
   }
 
   function goBack() {
@@ -2422,7 +2567,6 @@ export default function App() {
   }
 
   function navTab(s: Screen) {
-    // Check if trying to access Family Portal
     if (s === 'family') {
       setShowPinScreen(true)
       return
@@ -2430,315 +2574,259 @@ export default function App() {
 
     setHistory([])
     setScreen(s)
-    setMicActive(false)
   }
 
-  const mic = { micActive, onMicToggle: () => setMicActive(v => !v) }
-
   return (
-    <div className="flex size-full items-center justify-center" style={{ background: '#C8B9A8', fontFamily: 'Nunito, sans-serif' }}>
-      <div
-        className="relative flex flex-col overflow-hidden"
-        style={{
-          width: 390,
-          height: 844,
-          maxHeight: '100dvh',
-          maxWidth: '100vw',
-          borderRadius: 44,
-          boxShadow: '0 40px 100px rgba(0,0,0,0.38), 0 2px 8px rgba(0,0,0,0.18), inset 0 0 0 1px rgba(255,255,255,0.12)',
-          background: '#FBF8F0',
-          border: '10px solid #1A1512',
-        }}
-      >
-        {/* Status bar - show in both flows */}
-        <div className="flex shrink-0 items-center justify-between px-6 transition-colors duration-300" style={{ background: flow === 'portal' ? statusColor(screen) : 'rgba(0,0,0,0.1)', height: 44, position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50 }}>
-          <span className="text-xs font-bold" style={{ color: 'rgba(255,255,255,0.8)', fontFamily: 'DM Sans, sans-serif' }}>9:41</span>
-          <div className="h-5 w-28 rounded-full" style={{ background: 'rgba(0,0,0,0.5)' }} />
-          <span className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>●●● ▌</span>
-        </div>
+    <div className="relative flex size-full flex-col overflow-hidden" style={{ background: '#FBF8F0', fontFamily: 'Nunito, sans-serif' }}>
+      {/* Status bar - show in both flows */}
+      <div className="flex shrink-0 items-center justify-between px-6 transition-colors duration-300" style={{ background: flow === 'portal' ? statusColor(screen) : 'rgba(0,0,0,0.1)', height: 44, position: 'absolute', top: 0, left: 0, right: 0, zIndex: 50 }}>
+        <span className="text-xs font-bold" style={{ color: 'rgba(255,255,255,0.8)', fontFamily: 'DM Sans, sans-serif' }}>9:41</span>
+        <div className="h-5 w-28 rounded-full" style={{ background: 'rgba(0,0,0,0.5)' }} />
+        <span className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>●●● ▌</span>
+      </div>
 
-        {flow === 'onboarding' ? (
-          // ONBOARDING FLOW
-          <div className="h-full w-full bg-neutral-100 text-white">
-            {onboardStep === "welcome" && (
-              <section className="relative flex h-full flex-col justify-between overflow-hidden" style={{ background: '#FBF8F0' }}>
-                {/* Fluid background blobs */}
-                <svg className="absolute inset-0 w-full h-full" viewBox="0 0 390 760" preserveAspectRatio="xMidYMid slice" style={{ opacity: 0.9 }}>
-                  <defs>
-                    <radialGradient id="blob1" cx="50%" cy="50%">
-                      <stop offset="0%" stopColor="#355FC7" stopOpacity="0.18" />
-                      <stop offset="100%" stopColor="#355FC7" stopOpacity="0" />
-                    </radialGradient>
-                    <radialGradient id="blob2" cx="50%" cy="50%">
-                      <stop offset="0%" stopColor="#F1E3A4" stopOpacity="0.6" />
-                      <stop offset="100%" stopColor="#F1E3A4" stopOpacity="0" />
-                    </radialGradient>
-                    <radialGradient id="blob3" cx="50%" cy="50%">
-                      <stop offset="0%" stopColor="#C4622D" stopOpacity="0.13" />
-                      <stop offset="100%" stopColor="#C4622D" stopOpacity="0" />
-                    </radialGradient>
-                    <radialGradient id="blob4" cx="50%" cy="50%">
-                      <stop offset="0%" stopColor="#4A7C59" stopOpacity="0.14" />
-                      <stop offset="100%" stopColor="#4A7C59" stopOpacity="0" />
-                    </radialGradient>
-                  </defs>
-                  <ellipse cx="320" cy="80" rx="220" ry="200" fill="url(#blob1)" />
-                  <ellipse cx="60" cy="320" rx="180" ry="160" fill="url(#blob2)" />
-                  <ellipse cx="340" cy="500" rx="200" ry="180" fill="url(#blob3)" />
-                  <ellipse cx="80" cy="680" rx="160" ry="140" fill="url(#blob4)" />
-                  <ellipse cx="200" cy="200" rx="120" ry="100" fill="url(#blob2)" />
-                </svg>
+      {flow === 'onboarding' ? (
+        // ONBOARDING FLOW
+        <div className="h-full w-full bg-neutral-100 text-white">
+          {onboardStep === "welcome" && (
+            <section className="relative flex h-full flex-col justify-between overflow-hidden" style={{ background: '#FBF8F0' }}>
+              {/* Fluid background blobs */}
+              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 390 760" preserveAspectRatio="xMidYMid slice" style={{ opacity: 0.9 }}>
+                <defs>
+                  <radialGradient id="blob1" cx="50%" cy="50%">
+                    <stop offset="0%" stopColor="#355FC7" stopOpacity="0.18" />
+                    <stop offset="100%" stopColor="#355FC7" stopOpacity="0" />
+                  </radialGradient>
+                  <radialGradient id="blob2" cx="50%" cy="50%">
+                    <stop offset="0%" stopColor="#F1E3A4" stopOpacity="0.6" />
+                    <stop offset="100%" stopColor="#F1E3A4" stopOpacity="0" />
+                  </radialGradient>
+                  <radialGradient id="blob3" cx="50%" cy="50%">
+                    <stop offset="0%" stopColor="#C4622D" stopOpacity="0.13" />
+                    <stop offset="100%" stopColor="#C4622D" stopOpacity="0" />
+                  </radialGradient>
+                  <radialGradient id="blob4" cx="50%" cy="50%">
+                    <stop offset="0%" stopColor="#4A7C59" stopOpacity="0.14" />
+                    <stop offset="100%" stopColor="#4A7C59" stopOpacity="0" />
+                  </radialGradient>
+                </defs>
+                <ellipse cx="320" cy="80" rx="220" ry="200" fill="url(#blob1)" />
+                <ellipse cx="60" cy="320" rx="180" ry="160" fill="url(#blob2)" />
+                <ellipse cx="340" cy="500" rx="200" ry="180" fill="url(#blob3)" />
+                <ellipse cx="80" cy="680" rx="160" ry="140" fill="url(#blob4)" />
+                <ellipse cx="200" cy="200" rx="120" ry="100" fill="url(#blob2)" />
+              </svg>
 
-                {/* Top wordmark */}
-                <div className="relative px-8 pt-12">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: '#355FC7' }}>
-                      <span className="text-white text-sm font-black">M</span>
-                    </div>
-                    <span className="text-sm font-black tracking-widest uppercase" style={{ color: '#1D2B49', fontFamily: 'DM Sans, sans-serif', letterSpacing: '0.18em' }}>MemorySathi</span>
+              {/* Top wordmark */}
+              <div className="relative px-8 pt-12">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: '#355FC7' }}>
+                    <span className="text-white text-sm font-black">M</span>
                   </div>
+                  <span className="text-sm font-black tracking-widest uppercase" style={{ color: '#1D2B49', fontFamily: 'DM Sans, sans-serif', letterSpacing: '0.18em' }}>MemorySatahi</span>
                 </div>
+              </div>
 
-                {/* Center hero */}
-                <div className="relative flex flex-1 flex-col items-center justify-center px-8 text-center">
-                  {/* Orb */}
-                  <div className="relative mb-8">
-                    <div className="w-36 h-36 rounded-full flex items-center justify-center mx-auto" style={{ background: 'rgba(53,95,199,0.08)', border: '1.5px solid rgba(53,95,199,0.18)' }}>
-                      <div className="w-24 h-24 rounded-full flex items-center justify-center" style={{ background: 'rgba(53,95,199,0.12)', border: '1.5px solid rgba(53,95,199,0.22)' }}>
-                        <span className="text-5xl">🧠</span>
-                      </div>
+              {/* Center hero */}
+              <div className="relative flex flex-1 flex-col items-center justify-center px-8 text-center">
+                {/* Orb */}
+                <div className="relative mb-8">
+                  <div className="w-36 h-36 rounded-full flex items-center justify-center mx-auto" style={{ background: 'rgba(53,95,199,0.08)', border: '1.5px solid rgba(53,95,199,0.18)' }}>
+                    <div className="w-24 h-24 rounded-full flex items-center justify-center" style={{ background: 'rgba(53,95,199,0.12)', border: '1.5px solid rgba(53,95,199,0.22)' }}>
+                      <span className="text-5xl">🧠</span>
                     </div>
                   </div>
-
-                  <p className="text-xs font-bold tracking-[0.28em] uppercase mb-3" style={{ color: '#8499BC', fontFamily: 'DM Sans, sans-serif' }}>{t.welcome}</p>
-                  <h1 className="text-4xl font-extrabold leading-tight mb-4" style={{ color: '#1D2B49' }}>
-                    {t.heroTitle1}<br />{t.heroTitle2}
-                  </h1>
-                  <p className="text-base font-semibold leading-relaxed max-w-[260px]" style={{ color: '#7A6A5A' }}>
-                    {t.heroSubtitle}
-                  </p>
                 </div>
 
-                {/* Bottom CTA */}
-                <div className="relative px-6 pb-10">
-                  <button
-                    onClick={() => setOnboardStep("language")}
-                    className="w-full rounded-2xl px-5 py-5 text-lg font-extrabold transition-all active:scale-95"
-                    style={{ background: '#1D2B49', color: '#F1E3A4' }}
-                  >
-                    {t.letsBegin}
-                  </button>
-                  <p className="text-center text-xs font-semibold mt-4" style={{ color: '#B0A898', fontFamily: 'DM Sans, sans-serif' }}>
-                    {t.freeLine}
-                  </p>
+                <p className="text-xs font-bold tracking-[0.28em] uppercase mb-3" style={{ color: '#8499BC', fontFamily: 'DM Sans, sans-serif' }}>{t.welcome}</p>
+                <h1 className="text-4xl font-extrabold leading-tight mb-4" style={{ color: '#1D2B49' }}>
+                  {t.heroTitle1}<br />{t.heroTitle2}
+                </h1>
+                <p className="text-base font-semibold leading-relaxed max-w-[260px]" style={{ color: '#7A6A5A' }}>
+                  {t.heroSubtitle}
+                </p>
+              </div>
+
+              {/* Bottom CTA */}
+              <div className="relative px-6 pb-10">
+                <div className="mb-3">
+                  <LanguageDropdown value={selectedLanguage} onChange={setSelectedLanguage} />
                 </div>
-              </section>
-            )}
+                <button
+                  onClick={() => setOnboardStep("details")}
+                  className="w-full rounded-2xl px-5 py-5 text-lg font-extrabold transition-all active:scale-95"
+                  style={{ background: '#1D2B49', color: '#F1E3A4' }}
+                >
+                  {t.letsBegin}
+                </button>
+                <p className="text-center text-xs font-semibold mt-4" style={{ color: '#B0A898', fontFamily: 'DM Sans, sans-serif' }}>
+                  {t.freeLine}
+                </p>
+              </div>
+            </section>
+          )}
 
-            {onboardStep !== "welcome" && (
-              <main className="flex h-full items-center justify-center bg-gradient-to-br from-[#1D2B49] via-[#355FC7] to-[#4A7C59] px-5 pt-10">
-                <div className="w-full rounded-3xl bg-[#FBF8F0] p-6 text-gray-900 shadow-2xl">
-                  {onboardStep === "language" && (
-                    <>
-                      <h2 className="text-xl font-bold text-[#1D2B49]">{t.chooseLanguage}</h2>
-                      <p className="mt-1 text-sm text-[#7A6A5A]">{t.selectLanguage}</p>
+          {onboardStep !== "welcome" && (
+            <main className="flex h-full items-center justify-center bg-gradient-to-br from-[#1D2B49] via-[#355FC7] to-[#4A7C59] px-5 pt-10">
+              <div className="w-full rounded-3xl bg-[#FBF8F0] p-6 text-gray-900 shadow-2xl">
+                {onboardStep === "details" && (
+                  <>
+                    <h2 className="text-xl font-bold text-[#1D2B49]">{t.enterDetails}</h2>
+                    <p className="mt-1 text-sm text-[#7A6A5A]">{t.personalize}</p>
 
-                      <div className="mt-6 grid max-h-[46vh] gap-2 overflow-y-auto pr-1">
-                        {ONBOARD_LANGUAGES.map((language) => {
-                          const active = selectedLanguage === language.code;
-                          return (
-                            <button
-                              key={language.code}
-                              onClick={() => setSelectedLanguage(language.code)}
-                              className={`flex items-center justify-between rounded-2xl border px-4 py-3 text-left font-bold transition ${
-                                active
-                                  ? "border-[#355FC7] bg-[#EEF2FF] text-[#355FC7]"
-                                  : "border-[#E8D5B8] bg-white text-[#1D2B49] hover:bg-gray-50"
-                              }`}
-                            >
-                              <span>{language.label}</span>
-                              <span
-                                className="text-xs font-semibold"
-                                style={{ color: active ? '#355FC7' : '#8499BC' }}
-                              >
-                                {language.sub}
-                              </span>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      <div className="mt-6 flex gap-3">
-                        <button
-                          onClick={() => setOnboardStep("welcome")}
-                          className="w-1/3 rounded-2xl border border-[#E8D5B8] bg-white px-4 py-3 font-bold text-[#1D2B49]"
-                        >
-                          {t.back}
-                        </button>
-                        <button
-                          onClick={() => setOnboardStep("details")}
-                          disabled={!selectedLanguage}
-                          className="w-2/3 rounded-2xl bg-[#355FC7] px-4 py-3 font-bold text-white disabled:bg-[#8499BC]"
-                        >
-                          {t.continue}
-                        </button>
-                      </div>
-                    </>
-                  )}
-
-                  {onboardStep === "details" && (
-                    <>
-                      <h2 className="text-xl font-bold text-[#1D2B49]">{t.enterDetails}</h2>
-                      <p className="mt-1 text-sm text-[#7A6A5A]">{t.personalize}</p>
-
-                      <div className="mt-6 space-y-4">
-                        <div>
-                          <label className="mb-1 block text-sm font-bold text-[#1D2B49]">{t.fullName}</label>
-                          <input
-                            type="text"
-                            value={onboardName}
-                            onChange={(e) => setOnboardName(e.target.value)}
-                            placeholder={t.enterName}
-                            className="w-full rounded-2xl border border-[#E8D5B8] bg-white px-4 py-3 font-semibold text-[#1D2B49] outline-none focus:border-[#355FC7]"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="mb-1 block text-sm font-bold text-[#1D2B49]">{t.phoneNumber}</label>
-                          <input
-                            type="tel"
-                            inputMode="numeric"
-                            maxLength={10}
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-                            placeholder={t.enterPhone}
-                            className="w-full rounded-2xl border border-[#E8D5B8] bg-white px-4 py-3 font-semibold text-[#1D2B49] outline-none focus:border-[#355FC7]"
-                          />
-                          {phone.length > 0 && !isPhoneValid && (
-                            <p className="mt-2 text-xs font-bold text-[#C4622D]">{t.invalidPhone}</p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="mt-6 flex gap-3">
-                        <button
-                          onClick={() => setOnboardStep("language")}
-                          className="w-1/3 rounded-2xl border border-[#E8D5B8] bg-white px-4 py-3 font-bold text-[#1D2B49]"
-                        >
-                          {t.back}
-                        </button>
-                        <button
-                          onClick={() => setOnboardStep("pin")}
-                          disabled={!canContinueDetails}
-                          className="w-2/3 rounded-2xl bg-[#355FC7] px-4 py-3 font-bold text-white disabled:bg-[#8499BC]"
-                        >
-                          {t.continue}
-                        </button>
-                      </div>
-                    </>
-                  )}
-
-                  {onboardStep === "pin" && (
-                    <>
-                      <h2 className="text-xl font-bold text-[#1D2B49]">{t.setupPin}</h2>
-                      <p className="mt-1 text-sm text-[#7A6A5A]">{t.pinSubtitle}</p>
-
-                      <div className="mt-6">
-                        <label className="mb-1 block text-sm font-bold text-[#1D2B49]">{t.pinLabel}</label>
+                    <div className="mt-6 space-y-4">
+                      <div>
+                        <label className="mb-1 block text-sm font-bold text-[#1D2B49]">{t.fullName}</label>
                         <input
-                          type="password"
-                          inputMode="numeric"
-                          maxLength={4}
-                          value={pin}
-                          onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
-                          placeholder={t.pinPlaceholder}
-                          className="w-full rounded-2xl border border-[#E8D5B8] bg-white px-4 py-3 text-center text-xl font-bold tracking-[0.5em] text-[#1D2B49] outline-none focus:border-[#355FC7]"
+                          type="text"
+                          value={onboardName}
+                          onChange={(e) => setOnboardName(e.target.value)}
+                          placeholder={t.enterName}
+                          className="w-full rounded-2xl border border-[#E8D5B8] bg-white px-4 py-3 font-semibold text-[#1D2B49] outline-none focus:border-[#355FC7]"
                         />
-                        {pin.length > 0 && !isPinValid && (
-                          <p className="mt-2 text-xs font-bold text-[#C4622D]">{t.invalidPin}</p>
+                      </div>
+
+                      <div>
+                        <label className="mb-1 block text-sm font-bold text-[#1D2B49]">{t.phoneNumber}</label>
+                        <input
+                          type="tel"
+                          inputMode="numeric"
+                          maxLength={10}
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
+                          placeholder={t.enterPhone}
+                          className="w-full rounded-2xl border border-[#E8D5B8] bg-white px-4 py-3 font-semibold text-[#1D2B49] outline-none focus:border-[#355FC7]"
+                        />
+                        {phone.length > 0 && !isPhoneValid && (
+                          <p className="mt-2 text-xs font-bold text-[#C4622D]">{t.invalidPhone}</p>
                         )}
                       </div>
+                    </div>
 
-                      <div className="mt-6 flex gap-3">
-                        <button
-                          onClick={() => setOnboardStep("details")}
-                          className="w-1/3 rounded-2xl border border-[#E8D5B8] bg-white px-4 py-3 font-bold text-[#1D2B49]"
-                        >
-                          {t.back}
-                        </button>
-                        <button
-                          onClick={() => setOnboardStep("done")}
-                          disabled={!isPinValid}
-                          className="w-2/3 rounded-2xl bg-[#4A7C59] px-4 py-3 font-bold text-white disabled:bg-[#8499BC]"
-                        >
-                          Finish
-                        </button>
-                      </div>
-                    </>
-                  )}
-
-                  {onboardStep === "done" && (
-                    <>
-                      <div className="text-center">
-                        <span className="mb-2 block text-5xl">🎉</span>
-                        <h2 className="text-xl font-extrabold text-[#1D2B49]">{t.setupComplete}</h2>
-                        <p className="mt-2 text-sm font-semibold text-[#7A6A5A]">{t.readyToUse}</p>
-                      </div>
+                    <div className="mt-6 flex gap-3">
                       <button
-                        onClick={() => setFlow("portal")}
-                        className="mt-6 w-full rounded-2xl bg-[#355FC7] px-4 py-4 text-lg font-extrabold text-white"
+                        onClick={() => setOnboardStep("welcome")}
+                        className="w-1/3 rounded-2xl border border-[#E8D5B8] bg-white px-4 py-3 font-bold text-[#1D2B49]"
                       >
-                        {t.goToDashboard}
+                        {t.back}
                       </button>
-                    </>
-                  )}
-                </div>
-              </main>
-            )}
-          </div>
-        ) : (
-          // PORTAL FLOW (Your original app)
-          <>
-            {showPinScreen ? (
-              <PinVerificationScreen
-                onSuccess={() => {
-                  setShowPinScreen(false)
-                  setScreen('family')
-                }}
-                onBack={() => setShowPinScreen(false)}
-                patientName={onboardName}
-                correctPin={pin}
-                language={selectedLanguage}
-              />
-            ) : (
-              <>
-                <div className="flex-1 overflow-hidden pt-11">
-                  {screen === 'home' && (
-                    <HomeScreen
-                      onNavigate={navigate}
-                      patientName={onboardName}
-                      language={selectedLanguage}
-                    />
-                  )}
-                  {screen === 'games' && <GamesScreen onNavigate={navigate} onBack={goBack} {...mic} />}
-                  {screen === 'game-tree' && <FamilyTreeGame onBack={goBack} {...mic} />}
-                  {screen === 'game-match' && <MatchFaceGame onBack={goBack} {...mic} />}
-                  {screen === 'family' && <FamilyPortalScreen onNavigate={navigate} onBack={goBack} language={selectedLanguage} />}
-                  {screen === 'family-analytics' && <AnalyticsDashboard onBack={goBack} language={selectedLanguage} {...mic} />}
-                  {screen === 'family-photos' && <PhotoManager onBack={goBack} language={selectedLanguage} onLanguageChange={setSelectedLanguage} {...mic} />}
-                  {screen === 'care' && <CareScreen onBack={goBack} {...mic} />}
-                </div>
+                      <button
+                        onClick={() => setOnboardStep("pin")}
+                        disabled={!canContinueDetails}
+                        className="w-2/3 rounded-2xl bg-[#355FC7] px-4 py-3 font-bold text-white disabled:bg-[#8499BC]"
+                      >
+                        {t.continue}
+                      </button>
+                    </div>
+                  </>
+                )}
 
-                <BottomNav screen={screen} onNavigate={navTab} />
+                {onboardStep === "pin" && (
+                  <>
+                    <h2 className="text-xl font-bold text-[#1D2B49]">{t.setupPin}</h2>
+                    <p className="mt-1 text-sm text-[#7A6A5A]">{t.pinSubtitle}</p>
 
-                <div className="flex shrink-0 justify-center pb-2" style={{ background: '#FBF8F0' }}>
-                  <div className="h-1 w-28 rounded-full" style={{ background: '#1D2B4922' }} />
-                </div>
-              </>
-            )}
-          </>
-        )}
-      </div>
+                    <div className="mt-6">
+                      <label className="mb-1 block text-sm font-bold text-[#1D2B49]">{t.pinLabel}</label>
+                      <input
+                        type="password"
+                        inputMode="numeric"
+                        maxLength={4}
+                        value={pin}
+                        onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+                        placeholder={t.pinPlaceholder}
+                        className="w-full rounded-2xl border border-[#E8D5B8] bg-white px-4 py-3 text-center text-xl font-bold tracking-[0.5em] text-[#1D2B49] outline-none focus:border-[#355FC7]"
+                      />
+                      {pin.length > 0 && !isPinValid && (
+                        <p className="mt-2 text-xs font-bold text-[#C4622D]">{t.invalidPin}</p>
+                      )}
+                    </div>
+
+                    <div className="mt-6 flex gap-3">
+                      <button
+                        onClick={() => setOnboardStep("details")}
+                        className="w-1/3 rounded-2xl border border-[#E8D5B8] bg-white px-4 py-3 font-bold text-[#1D2B49]"
+                      >
+                        {t.back}
+                      </button>
+                      <button
+                        onClick={() => setOnboardStep("done")}
+                        disabled={!isPinValid}
+                        className="w-2/3 rounded-2xl bg-[#4A7C59] px-4 py-3 font-bold text-white disabled:bg-[#8499BC]"
+                      >
+                        Finish
+                      </button>
+                    </div>
+                  </>
+                )}
+
+                {onboardStep === "done" && (
+                  <>
+                    <div className="text-center">
+                      <span className="mb-2 block text-5xl">🎉</span>
+                      <h2 className="text-xl font-extrabold text-[#1D2B49]">{t.setupComplete}</h2>
+                      <p className="mt-2 text-sm font-semibold text-[#7A6A5A]">{t.readyToUse}</p>
+                    </div>
+                    <button
+                      onClick={() => setFlow("portal")}
+                      className="mt-6 w-full rounded-2xl bg-[#355FC7] px-4 py-4 text-lg font-extrabold text-white"
+                    >
+                      {t.goToDashboard}
+                    </button>
+                  </>
+                )}
+              </div>
+            </main>
+          )}
+        </div>
+      ) : (
+        // PORTAL FLOW
+        <>
+          {showPinScreen ? (
+            <PinVerificationScreen
+              onSuccess={() => {
+                setShowPinScreen(false)
+                setScreen('family')
+              }}
+              onBack={() => setShowPinScreen(false)}
+              patientName={onboardName}
+              correctPin={pin}
+              language={selectedLanguage}
+            />
+          ) : (
+            <>
+              <div className="flex-1 overflow-hidden pt-11">
+                {screen === 'home' && (
+                  <HomeScreen
+                    onNavigate={navigate}
+                    patientName={onboardName}
+                    language={selectedLanguage}
+                  />
+                )}
+                {screen === 'games' && <GamesScreen onNavigate={navigate} onBack={goBack} />}
+                {screen === 'game-tree' && <FamilyTreeGame onBack={goBack} />}
+                {screen === 'game-match' && <MatchFaceGame onBack={goBack} />}
+                {screen === 'game-coconut-mallet' && <CoconutMalletGame />}
+                {screen === 'game-jigsaw' && <JigsawPortal />}
+                {screen === 'game-pairs' && <PairsPortal />}
+                {screen === 'game-sort-match' && <SortMatchPortal />}
+                {screen === 'game-goat-sanctuary' && <GoatPuzzlePortal />}
+                {screen === 'game-folk-music' && <FolkMusicPortal />}
+                {screen === 'family' && <FamilyPortalScreen onNavigate={navigate} onBack={goBack} language={selectedLanguage} />}
+                {screen === 'family-analytics' && <AnalyticsDashboard onBack={goBack} language={selectedLanguage} />}
+                {screen === 'family-photos' && <PhotoManager onBack={goBack} language={selectedLanguage} onLanguageChange={setSelectedLanguage} />}
+                {screen === 'care' && <CareScreen onBack={goBack} />}
+              </div>
+
+              <BottomNav screen={screen} onNavigate={navTab} />
+
+              <div className="flex shrink-0 justify-center pb-2" style={{ background: '#FBF8F0' }}>
+                <div className="h-1 w-28 rounded-full" style={{ background: '#1D2B4922' }} />
+              </div>
+            </>
+          )}
+        </>
+      )}
     </div>
   )
 }
